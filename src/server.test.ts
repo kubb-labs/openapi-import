@@ -37,8 +37,18 @@ describe('server', () => {
     dir = await mkdtemp(path.join(repo, 'node_modules/.cache/openapi-import-'))
     await mkdir(path.join(dir, 'with-config/.config'), { recursive: true })
     await mkdir(path.join(dir, 'without-config'))
+    await mkdir(path.join(dir, 'parent-config/nested'), { recursive: true })
     await copyFile(spec, path.join(dir, 'with-config/petStore.openapi.yaml'))
     await copyFile(spec, path.join(dir, 'without-config/petStore.openapi.yaml'))
+    await copyFile(spec, path.join(dir, 'parent-config/nested/petStore.openapi.yaml'))
+    await writeFile(
+      path.join(dir, 'parent-config/kubb.config.ts'),
+      [
+        "import { pluginTs } from '@kubb/plugin-ts'",
+        "import { pluginZod } from '@kubb/plugin-zod'",
+        "export default { input: './petStore.openapi.yaml', output: { path: './gen' }, plugins: [pluginTs(), pluginZod()] }",
+      ].join('\n'),
+    )
     await writeFile(
       path.join(dir, 'with-config/.config/kubb.config.ts'),
       [
@@ -83,6 +93,21 @@ describe('server', () => {
 
     expect(opened!.result).toMatchObject({ configIdentity: 'none' })
     expect(opened!.result).not.toHaveProperty('optionDiagnostics')
+    expect(result.text).toContain('export type Pet = {')
+    expect(result.text).not.toContain('z.object(')
+  })
+
+  test('runs plugin-ts when the config of a parent folder is for another spec', async () => {
+    const project = path.join(dir, 'parent-config/nested')
+    const fileName = path.join(project, 'petStore.openapi.yaml')
+    const [, opened, transformed] = await send([
+      { method: 'initialize', params: {} },
+      { method: 'openProject', params: { projectHandle: 'p', configFileName: path.join(project, 'tsconfig.json') } },
+      { method: 'transform', params: { projectHandle: 'p', fileName, content: await readFile(fileName, 'utf8') } },
+    ])
+    const result = transformed!.result as { text: string }
+
+    expect(opened!.result).toMatchObject({ watchedFiles: expect.arrayContaining([path.join(dir, 'parent-config/kubb.config.ts')]) })
     expect(result.text).toContain('export type Pet = {')
     expect(result.text).not.toContain('z.object(')
   })

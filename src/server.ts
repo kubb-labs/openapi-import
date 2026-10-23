@@ -38,7 +38,7 @@ const handlers: Record<string, (params: never) => unknown> = {
     const project = await projects.get(params.projectHandle)
     if (project?.error) return { text: 'export {}', extension: '.ts', diagnostics: [{ messageText: project.error, start: 0, length: 0 }] }
 
-    return cachedTransform(params, project && selectConfig(project.configs, params.fileName, project.dir))
+    return cachedTransform(params, project && selectConfig({ configs: project.configs, fileName: params.fileName, cwd: project.dir }))
   },
 }
 
