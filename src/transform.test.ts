@@ -71,7 +71,9 @@ describe('transform mappings', async () => {
   const content = await readFile(fileName, 'utf8')
   const result = await transform({ fileName, content })
 
-  /** Each generated name with the spec text and line it maps to. */
+  /**
+   * Each generated name with the spec text and line it maps to.
+   */
   const mapped = (result.mappings ?? []).map(([virtualStart, virtualLength, originalStart, originalLength]) => ({
     name: result.text.slice(virtualStart, virtualStart + virtualLength),
     key: content.slice(originalStart, originalStart + originalLength),

@@ -6,11 +6,17 @@ import ts from '@typescript/typescript6'
  */
 export type Segment = [number, number, number, number, number, number]
 
-/** What the build saw, keyed by the names `@kubb/plugin-ts` emitted. */
+/**
+ * What the build saw, keyed by the names `@kubb/plugin-ts` emitted.
+ */
 export type Targets = {
-  /** Emitted type name to the `components.schemas` key it came from. */
+  /**
+   * Emitted type name to the `components.schemas` key it came from.
+   */
   schemas: Map<string, string>
-  /** Emitted operation name prefix (such as `GetPetById`) to its path and method. */
+  /**
+   * Emitted operation name prefix (such as `GetPetById`) to its path and method.
+   */
   operations: Map<string, { path: string; method: string }>
 }
 
@@ -20,7 +26,7 @@ const kindVerbatim = 0
 const kindAlias = 2
 // Hover, Definition, TypeDefinition, Implementation, References, DocumentHighlights.
 const features = 1 | 8 | 16 | 32 | 64 | 128
-// Only schema names rename into the spec: a stale `$ref` shows as an error, a stale `required` would not.
+// Only schema names rename into the spec. A stale `$ref` shows as an error, but a stale `required` entry fails silently.
 const renameFeature = 256
 
 const escapeToken = (token: string) => token.replaceAll('~', '~0').replaceAll('/', '~1')
@@ -61,7 +67,9 @@ function declarationPointers(name: string, { schemas, operations }: Targets): Ar
   return [operationPointer(`#/paths/${escapeToken(path)}/${method.toLowerCase()}`, name.slice(operationPrefix.length))]
 }
 
-/** The object literal a property type describes, looking through `T[]` and `Array<T>`. */
+/**
+ * The object literal a property type describes, looking through `T[]` and `Array<T>`.
+ */
 function objectLiteral(type: ts.TypeNode | undefined): { node: ts.TypeLiteralNode; items: boolean } | undefined {
   if (!type) return undefined
   if (ts.isTypeLiteralNode(type)) return { node: type, items: false }
@@ -72,7 +80,9 @@ function objectLiteral(type: ts.TypeNode | undefined): { node: ts.TypeLiteralNod
   return undefined
 }
 
-/** The members of an interface, or of a type alias for an object literal. */
+/**
+ * The members of an interface, or of a type alias for an object literal.
+ */
 function typeMembers(statement: ts.TypeAliasDeclaration | ts.InterfaceDeclaration): ts.NodeArray<ts.TypeElement> | undefined {
   if (ts.isInterfaceDeclaration(statement)) return statement.members
   return ts.isTypeLiteralNode(statement.type) ? statement.type.members : undefined

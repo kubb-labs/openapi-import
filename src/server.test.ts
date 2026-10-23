@@ -7,7 +7,9 @@ import { createDecoder, encode, type Message } from './rpc.ts'
 const repo = path.resolve(import.meta.dirname, '..')
 const spec = path.join(repo, 'examples/pet-store/petStore.openapi.yaml')
 
-/** Starts the built server and sends every request at once, without waiting for replies. */
+/**
+ * Starts the built server and sends every request at once, without waiting for replies.
+ */
 async function send(requests: Array<{ method: string; params: unknown }>): Promise<Array<Message>> {
   const server = spawn(process.execPath, [path.join(repo, 'dist/server.js')], { stdio: ['pipe', 'pipe', 'inherit'] })
   const replies = new Map<unknown, Message>()

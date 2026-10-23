@@ -1,4 +1,6 @@
-/** A JSON-RPC 2.0 message as the TypeScript content mapper host sends and expects it. */
+/**
+ * A JSON-RPC 2.0 message as the TypeScript content mapper host sends and expects it.
+ */
 export type Message = {
   id?: number | string
   method?: string
@@ -9,7 +11,9 @@ export type Message = {
 
 const separator = '\r\n\r\n'
 
-/** Frames a message with the LSP base protocol `Content-Length` header the host reads. */
+/**
+ * Frames a message with the LSP base protocol `Content-Length` header the host reads.
+ */
 export function encode(message: Message): Buffer {
   const body = Buffer.from(JSON.stringify({ jsonrpc: '2.0', ...message }))
 

@@ -6,13 +6,17 @@ import { parseDocument } from 'yaml'
 import { createLocator } from './locate.ts'
 import { createMappings, type Segment, type Targets } from './mappings.ts'
 
-/** Parameters of the content mapper `transform` request. */
+/**
+ * Parameters of the content mapper `transform` request.
+ */
 export type TransformParams = {
   fileName: string
   content: string
 }
 
-/** The module TypeScript checks in place of the spec, and the segments linking it to the spec. */
+/**
+ * The module TypeScript checks in place of the spec, and the segments linking it to the spec.
+ */
 export type TransformResult = {
   text: string
   extension: '.ts'
@@ -22,8 +26,9 @@ export type TransformResult = {
 
 /**
  * Generates the module for one spec with `generateModule` from `unplugin-kubb`, the same one a
- * bundler loads. Without a config, only `@kubb/plugin-ts` runs. The spec comes from the request,
- * so unsaved edits are typed, and is parsed once for the build, the diagnostics and the mappings.
+ * bundler loads. Without a config, only `@kubb/plugin-ts` runs. The spec text comes from the
+ * request, so unsaved edits are checked too. It is parsed once and shared by the build, the
+ * diagnostics and the mappings.
  */
 export async function transform({ fileName, content }: TransformParams, config?: UserConfig): Promise<TransformResult> {
   const document = parseDocument(content)
