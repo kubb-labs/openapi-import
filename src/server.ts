@@ -38,7 +38,10 @@ const handlers: Record<string, (params: never) => unknown> = {
     const project = projects.get(params.projectHandle)
     if (project?.config.error) return { text: 'export {}', extension: '.ts', diagnostics: [{ messageText: project.config.error, start: 0, length: 0 }] }
 
-    return cachedTransform(params, { ...project?.options, config: project && selectConfig(project.config.configs, params.fileName, dirname(project.config.file)) })
+    return cachedTransform(params, {
+      ...project?.options,
+      config: project && selectConfig(project.config.configs, params.fileName, dirname(project.config.file)),
+    })
   },
 }
 
