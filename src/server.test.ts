@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 import { createDecoder, encode, type Message } from './rpc.ts'
 
 const repo = path.resolve(import.meta.dirname, '..')
-const spec = path.join(repo, 'examples/pet-store/openapi.yaml')
+const spec = path.join(repo, 'examples/pet-store/petStore.openapi.yaml')
 
 /**
  * Starts the built server and sends every request at once, without waiting for replies.
@@ -37,8 +37,8 @@ describe('server', () => {
     dir = await mkdtemp(path.join(repo, 'node_modules/.cache/openapi-import-'))
     await mkdir(path.join(dir, 'with-config/.config'), { recursive: true })
     await mkdir(path.join(dir, 'without-config'))
-    await copyFile(spec, path.join(dir, 'with-config/openapi.yaml'))
-    await copyFile(spec, path.join(dir, 'without-config/openapi.yaml'))
+    await copyFile(spec, path.join(dir, 'with-config/petStore.openapi.yaml'))
+    await copyFile(spec, path.join(dir, 'without-config/petStore.openapi.yaml'))
     await writeFile(
       path.join(dir, 'with-config/.config/kubb.config.ts'),
       [
@@ -46,7 +46,7 @@ describe('server', () => {
         "import { pluginZod } from '@kubb/plugin-zod'",
         'export default [',
         "  { input: './other.openapi.yaml', output: { path: './gen' }, plugins: [pluginTs()] },",
-        "  { input: './openapi.yaml', output: { path: './gen' }, plugins: [pluginTs(), pluginZod()] },",
+        "  { input: './petStore.openapi.yaml', output: { path: './gen' }, plugins: [pluginTs(), pluginZod()] },",
         ']',
       ].join('\n'),
     )
@@ -58,7 +58,7 @@ describe('server', () => {
 
   test('waits for the config, picks the matching one from .config/ and reports tsconfig options', async () => {
     const project = path.join(dir, 'with-config')
-    const fileName = path.join(project, 'openapi.yaml')
+    const fileName = path.join(project, 'petStore.openapi.yaml')
     const [, opened, transformed] = await send([
       { method: 'initialize', params: {} },
       { method: 'openProject', params: { projectHandle: 'p', configFileName: path.join(project, 'tsconfig.json'), options: { arrayType: 'generic' } } },
@@ -73,7 +73,7 @@ describe('server', () => {
 
   test('runs plugin-ts without a kubb.config.ts', async () => {
     const project = path.join(dir, 'without-config')
-    const fileName = path.join(project, 'openapi.yaml')
+    const fileName = path.join(project, 'petStore.openapi.yaml')
     const [, opened, transformed] = await send([
       { method: 'initialize', params: {} },
       { method: 'openProject', params: { projectHandle: 'p', configFileName: path.join(project, 'tsconfig.json') } },

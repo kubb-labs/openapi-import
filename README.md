@@ -3,7 +3,7 @@
 Import an OpenAPI spec in TypeScript and get the code the plugins in your `kubb.config.ts` generate, without generated files.
 
 ```ts
-import { type Pet, petSchema } from './openapi.yaml'
+import { type Pet, petSchema } from './petStore.openapi.yaml'
 ```
 
 It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/pull/4712): TypeScript 7.1 type-checks the output of every plugin in your config in place of the spec.
@@ -13,7 +13,7 @@ It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/p
 
 ## Features
 
-- Import an OpenAPI spec such as `openapi.yaml` straight into TypeScript, with no generated files.
+- Import a `.openapi.yaml` spec straight into TypeScript, with no generated files.
 - Works without a config: you get the types from `@kubb/plugin-ts`.
 - Add a `kubb.config.ts` to get Zod schemas, clients and the output of any other Kubb plugin from the same import.
 - Autocomplete and type errors come from the spec.
@@ -31,11 +31,11 @@ pnpm add -D kubb openapi-import typescript@beta @kubb/plugin-ts
 
 With npm, `tsc` runs TypeScript 6, because `@typescript/typescript6` links its `tsc` over the one from `typescript`. Run `node node_modules/typescript/bin/tsc` instead.
 
-Register the `.yaml` and `.yml` extensions in `tsconfig.json`, and name the spec `openapi.yaml` or `<name>.openapi.yaml`. Other YAML files, such as `docker-compose.yaml`, import as their parsed data in a default export. `.json` can't be mapped.
+Register the `.openapi.yaml` extension in `tsconfig.json`. A plain `.yaml` would also send files such as `docker-compose.yaml` to the mapper, and `.json` can't be mapped.
 
 ```json
 {
-  "contentMappers": [{ "package": "openapi-import", "extensions": [".yaml", ".yml"] }]
+  "contentMappers": [{ "package": "openapi-import", "extensions": [".openapi.yaml", ".openapi.yml"] }]
 }
 ```
 

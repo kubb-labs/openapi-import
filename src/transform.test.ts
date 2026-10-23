@@ -5,7 +5,7 @@ import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 import { transform } from './transform.ts'
 
-const fileName = path.resolve(import.meta.dirname, '../examples/pet-store/openapi.yaml')
+const fileName = path.resolve(import.meta.dirname, '../examples/pet-store/petStore.openapi.yaml')
 
 describe('transform', () => {
   test('returns the plugin-ts types of a spec as one module', async () => {
@@ -29,19 +29,6 @@ describe('transform', () => {
     expect(result.text).toContain('export const petSchema = z.object(')
     expect(result.text).toMatch(/^import \* as z from 'zod'$/m)
     expect(mapped).toContain('petSchema')
-  })
-
-  test('maps openapi.yaml and *.openapi.yaml and exports other YAML files as data', async () => {
-    const content = await readFile(fileName, 'utf8')
-    const named = await transform({ fileName: path.join(path.dirname(fileName), 'pet.openapi.yml'), content })
-    const other = await transform({ fileName: path.join(path.dirname(fileName), 'docker-compose.yaml'), content: 'services:\n  web:\n    image: nginx\n' })
-    const empty = await transform({ fileName: path.join(path.dirname(fileName), 'empty.yaml'), content: '' })
-    const lookalike = await transform({ fileName: path.join(path.dirname(fileName), 'myopenapi.yaml'), content })
-
-    expect(named.text).toContain('export type Pet = {')
-    expect(other).toEqual({ text: 'const value = {"services":{"web":{"image":"nginx"}}}\nexport default value\n', extension: '.ts' })
-    expect(empty.text).toBe('const value = null\nexport default value\n')
-    expect(lookalike.text).toMatch(/^const value = \{"openapi":/)
   })
 
   test('reports a kubb.config.ts that generates no code', async () => {

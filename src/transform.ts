@@ -8,9 +8,6 @@ import { parseDocument } from 'yaml'
 import { createLocator } from './locate.ts'
 import { createMappings, type Segment, type Targets } from './mappings.ts'
 
-/** Spec files the mapper generates code for: `openapi.yaml` and `*.openapi.yaml`, also as `.yml`. */
-const specFilePattern = /(?:^|[\\/.])openapi\.ya?ml$/
-
 /**
  * Parameters of the content mapper `transform` request.
  */
@@ -73,10 +70,6 @@ export async function transform({ fileName, content }: TransformParams, config?:
       diagnostics: document.errors.map((error) => ({ messageText: error.message, start: error.pos[0], length: error.pos[1] - error.pos[0] })),
     }
   }
-
-  // A `.yaml` extension in tsconfig sends every YAML file here, such as `docker-compose.yaml`.
-  // Those keep the default export a YAML bundler plugin gives them at run time.
-  if (!specFilePattern.test(fileName)) return { text: `const value = ${JSON.stringify(document.toJS())}\nexport default value\n`, extension: '.ts' }
 
   const hooks = new Hookable<KubbHooks>()
   const targets: Targets = { schemas: new Map(), operations: new Map() }
