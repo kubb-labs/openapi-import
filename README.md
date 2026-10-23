@@ -14,7 +14,7 @@ It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/p
 ## Setup
 
 ```bash
-pnpm add -D kubb openapi-import typescript@beta
+pnpm add -D kubb openapi-import typescript@beta @kubb/plugin-ts
 ```
 
 With npm, `tsc` runs TypeScript 6, because `@typescript/typescript6` links its `tsc` over the one from `typescript`. Run `node node_modules/typescript/bin/tsc` instead.
@@ -27,7 +27,7 @@ Register the `.openapi.yaml` extension in `tsconfig.json`. A plain `.yaml` would
 }
 ```
 
-Add the plugins you want to `kubb.config.ts`:
+Add the plugins you want to `kubb.config.ts`, and install them, such as `@kubb/plugin-zod` and `zod`:
 
 ```ts
 import { pluginTs } from '@kubb/plugin-ts'
@@ -35,13 +35,14 @@ import { pluginZod } from '@kubb/plugin-zod'
 import { defineConfig } from 'kubb/config'
 
 export default defineConfig({
-  input: './petStore.openapi.yaml',
   output: { path: './src/gen' },
   plugins: [pluginTs(), pluginZod()],
 })
 ```
 
-The mapper finds the config like the Kubb CLI does and reloads it when it changes. With several configs, a spec uses the one whose `input` matches it. Without a config, only `@kubb/plugin-ts` runs. For values at run time, add `kubb()` from `kubb/vite` or another bundler entry. It reads the same config.
+The mapper finds the config like the Kubb CLI does and reloads it when it changes. With several configs, a spec uses the one whose `input` matches it. Without a config, only `@kubb/plugin-ts` runs.
+
+For values at run time, add `kubb()` from `kubb/vite` or another bundler entry, without a `config` option, so it reads the same `kubb.config.ts` as `tsc`. A config with an `input` also writes the generated files at build time, so leave it out to import specs only.
 
 Run the type check:
 
@@ -71,6 +72,7 @@ Spec errors, such as an unresolved `$ref`, show on the key they point at. See [`
 
 - Code a plugin writes to a separate file, such as a bundled client runtime, is not included. Point imports like the client's `importPath` at a package.
 - Properties of operation types don't link to the spec, and renaming a property doesn't rename its key.
+- Files that `kubb.config.ts` imports are not watched. Restart the TypeScript server after you change them.
 - A changed spec runs a full Kubb build: about 0.4 s for a 10 KB spec and 2.6 s for a 1.4 MB spec.
 
 ## Supporting Kubb
