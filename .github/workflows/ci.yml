@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['main']
+  pull_request:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Lint, test and typecheck
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Tools
+        uses: kubb-labs/config/.github/setup@343e250ace24b6ee7e9694e9e06a594aeb8e01c3 # main
+
+      - name: Format
+        run: pnpm run format:check
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Test
+        run: pnpm run test
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Typecheck example
+        run: pnpm run typecheck:example

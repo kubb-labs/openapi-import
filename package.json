@@ -1,0 +1,100 @@
+{
+  "name": "openapi-import",
+  "version": "0.0.0",
+  "description": "Import OpenAPI specs in TypeScript with types from Kubb, through TypeScript 7.1 content mappers. No generated files.",
+  "keywords": [
+    "code-generation",
+    "codegen",
+    "content-mapper",
+    "kubb",
+    "openapi",
+    "openapi-import",
+    "typescript"
+  ],
+  "homepage": "https://github.com/kubb-labs/openapi-import#readme",
+  "bugs": {
+    "url": "https://github.com/kubb-labs/openapi-import/issues"
+  },
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubb-labs/openapi-import.git"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/stijnvanhulle"
+    },
+    {
+      "type": "opencollective",
+      "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
+    }
+  ],
+  "files": [
+    "dist",
+    "!/**/**.test.**"
+  ],
+  "type": "module",
+  "sideEffects": true,
+  "exports": {
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "changeset": "changeset",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
+    "format": "oxfmt -c oxfmt.config.ts .",
+    "format:check": "oxfmt -c oxfmt.config.ts --check .",
+    "lint": "oxlint -c oxlint.config.ts .",
+    "lint:fix": "oxlint -c oxlint.config.ts --fix .",
+    "start": "tsdown --watch",
+    "test": "vitest run",
+    "typecheck": "tsc",
+    "typecheck:example": "pnpm --filter openapi-import-pet-store typecheck"
+  },
+  "dependencies": {
+    "@kubb/adapter-oas": "^5.12.4",
+    "@kubb/core": "^5.12.4",
+    "@kubb/parser-ts": "^5.12.4",
+    "@kubb/plugin-ts": "^5.0.14",
+    "@typescript/typescript6": "^6.0.2",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
+    "@types/node": "22.20.2",
+    "@vitest/coverage-v8": "^5.0.5",
+    "kubb": "^5.12.4",
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.88.0",
+    "tsdown": "^0.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  },
+  "peerDependencies": {
+    "kubb": "^5.12.4"
+  },
+  "typescript": {
+    "contentMapper": {
+      "exec": [
+        "node",
+        "dist/server.js"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=22.12",
+    "pnpm": ">=11.0.0"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

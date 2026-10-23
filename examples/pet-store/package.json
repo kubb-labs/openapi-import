@@ -1,0 +1,18 @@
+{
+  "name": "openapi-import-pet-store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PetStore example that imports types straight from the spec with openapi-import",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --runExternalCode"
+  },
+  "dependencies": {
+    "kubb": "^5.12.4",
+    "openapi-import": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "7.1.0-dev.20261022.1"
+  }
+}
