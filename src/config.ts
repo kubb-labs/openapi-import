@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import type { UserConfig } from '@kubb/core'
+import type { UserConfig } from 'kubb'
 import { configFileCandidates, findConfigFile, loadConfigFile } from 'unplugin-kubb'
 
 /**

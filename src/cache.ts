@@ -1,4 +1,4 @@
-import type { UserConfig } from '@kubb/core'
+import type { UserConfig } from 'kubb'
 import type { TransformParams } from './transform.ts'
 
 /**

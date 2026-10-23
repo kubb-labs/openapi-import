@@ -1,5 +1,6 @@
 import { dirname } from 'node:path'
-import { Hookable, type KubbHooks, type UserConfig } from '@kubb/core'
+import type { UserConfig } from 'kubb'
+import { Hookable, type KubbHooks } from 'kubb/kit'
 import { pluginTs } from '@kubb/plugin-ts'
 import { generateModule } from 'unplugin-kubb'
 import { parseDocument } from 'yaml'
