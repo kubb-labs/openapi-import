@@ -54,8 +54,6 @@ export default defineConfig({
 
 The mapper finds the config like the Kubb CLI does and reloads it when it changes. With several configs, a spec uses the one whose `input` matches it. Without a config, only `@kubb/plugin-ts` runs.
 
-For values at run time, add `kubb()` from `kubb/vite` or another bundler entry, without a `config` option, so it reads the same `kubb.config.ts` as `tsc`. A config with an `input` also writes the generated files at build time, so leave it out to import specs only.
-
 Run the type check:
 
 ```bash
@@ -63,6 +61,34 @@ tsc --noEmit --runExternalCode
 ```
 
 VS Code only passes `--runExternalCode` in trusted workspaces.
+
+## Run time
+
+`tsc` only checks the types, so values such as `petSchema` need a bundler. Add `kubb()` from `kubb/vite`, or another entry such as `kubb/webpack` or `kubb/rollup`, without a `config` option. It then reads the same `kubb.config.ts` as `tsc`:
+
+```ts
+// vite.config.ts
+import kubb from 'kubb/vite'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [kubb()],
+})
+```
+
+The types and the values come from the same import:
+
+```ts
+import { type GetPetByIdPath, type GetPetByIdResponse, petSchema } from '../petStore.openapi.yaml'
+
+export async function getPetById({ petId }: GetPetByIdPath): Promise<GetPetByIdResponse> {
+  const response = await fetch(`https://petstore3.swagger.io/api/v3/pet/${petId}`)
+
+  return petSchema.parse(await response.json())
+}
+```
+
+A config with an `input` also writes the generated files at build time, so leave it out to import specs only. The bundler reads `kubb.config.ts` once, so restart it after you change the config.
 
 ## Editor support
 
