@@ -31,15 +31,17 @@ describe('transform', () => {
     expect(mapped).toContain('petSchema')
   })
 
-  test('maps openapi.yaml and *.openapi.yaml and leaves other YAML files empty', async () => {
+  test('maps openapi.yaml and *.openapi.yaml and exports other YAML files as data', async () => {
     const content = await readFile(fileName, 'utf8')
     const named = await transform({ fileName: path.join(path.dirname(fileName), 'pet.openapi.yml'), content })
-    const other = await transform({ fileName: path.join(path.dirname(fileName), 'docker-compose.yaml'), content: 'services: {}' })
+    const other = await transform({ fileName: path.join(path.dirname(fileName), 'docker-compose.yaml'), content: 'services:\n  web:\n    image: nginx\n' })
+    const empty = await transform({ fileName: path.join(path.dirname(fileName), 'empty.yaml'), content: '' })
     const lookalike = await transform({ fileName: path.join(path.dirname(fileName), 'myopenapi.yaml'), content })
 
     expect(named.text).toContain('export type Pet = {')
-    expect(other).toEqual({ text: 'export {}', extension: '.ts' })
-    expect(lookalike).toEqual({ text: 'export {}', extension: '.ts' })
+    expect(other).toEqual({ text: 'const value = {"services":{"web":{"image":"nginx"}}}\nexport default value\n', extension: '.ts' })
+    expect(empty.text).toBe('const value = null\nexport default value\n')
+    expect(lookalike.text).toMatch(/^const value = \{"openapi":/)
   })
 
   test('reports a kubb.config.ts that generates no code', async () => {

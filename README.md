@@ -31,7 +31,7 @@ pnpm add -D kubb openapi-import typescript@beta @kubb/plugin-ts
 
 With npm, `tsc` runs TypeScript 6, because `@typescript/typescript6` links its `tsc` over the one from `typescript`. Run `node node_modules/typescript/bin/tsc` instead.
 
-Register the `.yaml` and `.yml` extensions in `tsconfig.json`, and name the spec `openapi.yaml` or `<name>.openapi.yaml`. `.json` can't be mapped.
+Register the `.yaml` and `.yml` extensions in `tsconfig.json`, and name the spec `openapi.yaml` or `<name>.openapi.yaml`. Other YAML files, such as `docker-compose.yaml`, import as their parsed data in a default export. `.json` can't be mapped.
 
 ```json
 {

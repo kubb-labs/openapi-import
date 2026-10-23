@@ -65,9 +65,6 @@ function keepSpecCasing(config: UserConfig): UserConfig {
  * diagnostics and the mappings.
  */
 export async function transform({ fileName, content }: TransformParams, config?: UserConfig): Promise<TransformResult> {
-  // A `.yaml` extension in tsconfig sends every YAML file here, such as `docker-compose.yaml`.
-  if (!specFilePattern.test(fileName)) return { text: 'export {}', extension: '.ts' }
-
   const document = parseDocument(content)
   if (document.errors.length) {
     return {
@@ -76,6 +73,10 @@ export async function transform({ fileName, content }: TransformParams, config?:
       diagnostics: document.errors.map((error) => ({ messageText: error.message, start: error.pos[0], length: error.pos[1] - error.pos[0] })),
     }
   }
+
+  // A `.yaml` extension in tsconfig sends every YAML file here, such as `docker-compose.yaml`.
+  // Those keep the default export a YAML bundler plugin gives them at run time.
+  if (!specFilePattern.test(fileName)) return { text: `const value = ${JSON.stringify(document.toJS())}\nexport default value\n`, extension: '.ts' }
 
   const hooks = new Hookable<KubbHooks>()
   const targets: Targets = { schemas: new Map(), operations: new Map() }
