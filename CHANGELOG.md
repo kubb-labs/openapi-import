@@ -1,5 +1,11 @@
 # openapi-import
 
+## 0.0.3
+
+### Patch Changes
+
+- [#10](https://github.com/kubb-labs/openapi-import/pull/10) [`348b7b0`](https://github.com/kubb-labs/openapi-import/commit/348b7b0937287ce3665dd80fb95105eb38cb919a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Skip a `kubb.config.ts` whose `input` points at another spec, such as one in a parent folder, so the import gets plain `@kubb/plugin-ts` types that keep the spec's property names.
+
 ## 0.0.2
 
 ### Patch Changes
