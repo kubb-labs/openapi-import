@@ -93,7 +93,7 @@ export default defineConfig({
 })
 ```
 
-Put the config next to `tsconfig.json` or in a parent folder. The editor picks up changes to it. A spec uses the config whose `input` points at it, or else one without an `input`. A config whose `input` is another spec does not apply, so the import gets plain `pluginTs()` types.
+Put the config next to `tsconfig.json` or in a parent folder. The editor picks up changes to it. With several configs, a spec uses the one whose `input` points at it.
 
 ## Use values at run time
 
