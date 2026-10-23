@@ -1,17 +1,15 @@
 # openapi-import
 
-Import an OpenAPI spec straight into TypeScript and get what the plugins in your `kubb.config.ts` generate, with no generated files on disk.
+Import an OpenAPI spec in TypeScript and get the code the plugins in your `kubb.config.ts` generate, without generated files.
 
 ```ts
 import { type Pet, petSchema } from './petStore.openapi.yaml'
-
-const pet: Pet = petSchema.parse({ name: 'Rex', photoUrls: [] })
 ```
 
-It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/pull/4712). TypeScript 7.1 calls it for each spec file and type-checks the output of every plugin in `kubb.config.ts`, merged into one module, in its place.
+It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/pull/4712): TypeScript 7.1 type-checks the output of every plugin in your config in place of the spec.
 
 > [!WARNING]
-> Experimental. Content mappers need a TypeScript 7.1 build that supports `--runExternalCode` (`typescript@beta`, 7.1.0-beta or later). TypeScript does not emit content-mapped files to JavaScript, so values such as `petSchema` only exist at run time when a bundler loads the spec with [`unplugin-kubb`](https://github.com/kubb-labs/kubb/tree/main/packages/unplugin-kubb). Both use `generateModule` from `unplugin-kubb`, so the import has the same exports in `tsc` and in the bundle.
+> Experimental. It needs TypeScript 7.1.0-beta or later with `--runExternalCode`. TypeScript does not emit the spec to JavaScript, so values such as `petSchema` only exist at run time when a bundler loads the spec with [`unplugin-kubb`](https://github.com/kubb-labs/kubb/tree/main/packages/unplugin-kubb).
 
 ## Setup
 
@@ -19,9 +17,9 @@ It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/p
 pnpm add -D kubb openapi-import typescript@beta
 ```
 
-With npm, `npx tsc` and `tsc` in package scripts run TypeScript 6. `openapi-import` and `@kubb/parser-ts` depend on `@typescript/typescript6`, which installs TypeScript 6 as `@typescript/old`, and npm links its `tsc` over the one from `typescript`. Run `node node_modules/typescript/bin/tsc` instead. pnpm does not have this problem.
+With npm, `tsc` runs TypeScript 6, because `@typescript/typescript6` links its `tsc` over the one from `typescript`. Run `node node_modules/typescript/bin/tsc` instead.
 
-Name your specs with an `.openapi.yaml` extension, such as `petStore.openapi.yaml`, and register that extension in `tsconfig.json`:
+Register the `.openapi.yaml` extension in `tsconfig.json`. A plain `.yaml` would also send files such as `docker-compose.yaml` to the mapper, and `.json` can't be mapped.
 
 ```json
 {
@@ -29,9 +27,7 @@ Name your specs with an `.openapi.yaml` extension, such as `petStore.openapi.yam
 }
 ```
 
-TypeScript sends every file with a registered extension that `include` matches to the mapper, not only the files you import. A plain `.yaml` would also pick up files such as `docker-compose.yaml` and fail on them, and it would block other content mappers from `.yaml`. JSON specs cannot be mapped: TypeScript treats any extension ending in `.json` as built-in.
-
-Add a `kubb.config.ts` with the plugins you want, the way the Kubb CLI finds it (from the `tsconfig.json` folder up):
+Add the plugins you want to `kubb.config.ts`:
 
 ```ts
 import { pluginTs } from '@kubb/plugin-ts'
@@ -45,43 +41,19 @@ export default defineConfig({
 })
 ```
 
-The config's adapter and plugins run on each imported spec. Its `output` and hooks are not used, and the barrel plugin is left out. With several configs, a spec uses the one whose `input` is that spec, else the first. Without a `kubb.config.ts`, only `@kubb/plugin-ts` runs.
+The mapper finds the config like the Kubb CLI does and reloads it when it changes. With several configs, a spec uses the one whose `input` matches it. Without a config, only `@kubb/plugin-ts` runs. For values at run time, add `kubb()` from `kubb/vite` or another bundler entry. It reads the same config.
 
-TypeScript watches the config file and types every spec again when it changes.
-
-For values at run time, add `kubb()` from `kubb/vite` (or another bundler entry) without arguments. It loads the same `kubb.config.ts`.
-
-Add a `kubb.config.ts` with the plugins you want, the way the Kubb CLI finds it (from the `tsconfig.json` folder up):
-
-```ts
-import { pluginTs } from '@kubb/plugin-ts'
-import { pluginZod } from '@kubb/plugin-zod'
-import { defineConfig } from 'kubb/config'
-
-export default defineConfig({
-  input: './petStore.openapi.yaml',
-  output: { path: './src/gen' },
-  plugins: [pluginTs(), pluginZod()],
-})
-```
-
-The config's adapter and plugins run on each imported spec. Its `output` and hooks are not used, and the barrel plugin is left out. With several configs, a spec uses the one whose `input` is that spec, else the first. Without a `kubb.config.ts`, only `@kubb/plugin-ts` runs.
-
-TypeScript watches the config file and types every spec again when it changes.
-
-For values at run time, add `kubb()` from `kubb/vite` (or another bundler entry) without arguments. It loads the same `kubb.config.ts`.
-
-Run the type check with external code allowed:
+Run the type check:
 
 ```bash
 tsc --noEmit --runExternalCode
 ```
 
-VS Code passes `--runExternalCode` to the TypeScript language server only in trusted workspaces.
+VS Code only passes `--runExternalCode` in trusted workspaces.
 
 ## Editor support
 
-Generated names link back to the keys they came from in the spec. Go to definition and find references cross from TypeScript into the YAML, and hovering a key in the YAML shows its generated type. Renaming a schema type that is named exactly like its key, such as `Pet`, renames the key in the spec. Update the `$ref`s to it yourself: each one left behind shows as an unresolved `$ref`. Renaming a schema type that is named exactly like its key, such as `Pet`, renames the key in the spec. Update the `$ref`s to it yourself: each one left behind shows as an unresolved `$ref`.
+Go to definition, find references and hover link generated names to their keys in the spec. Renaming a schema type named like its key, such as `Pet`, renames the key too. Update the `$ref`s to it yourself.
 
 | Generated name                                                | Jumps to                                                                  |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------- |
@@ -93,15 +65,13 @@ Generated names link back to the keys they came from in the spec. Go to definiti
 | `GetPetByIdStatus404`                                         | `responses.404`                                                           |
 | `AddPetBody`                                                  | the operation's `requestBody`                                             |
 
-Spec errors, such as an unresolved `$ref`, show on the key or value they point at.
-
-See [`examples/pet-store`](./examples/pet-store) for a working setup.
+Spec errors, such as an unresolved `$ref`, show on the key they point at. See [`examples/pet-store`](./examples/pet-store) for a working setup.
 
 ## Limits
 
-- The module only holds the file each plugin writes its code to. Code a plugin writes to another file, such as a bundled client runtime, is left out, so point imports like the client's `importPath` at a package or a path relative to the spec.
-- Properties of operation types (path parameters, inline response bodies) do not link to the spec, and renaming a property does not rename its key in the spec.
-- A changed spec runs a full Kubb build: about 0.4 s and 155 MB for a 10 KB spec, about 2.6 s and 245 MB for a 1.4 MB spec. A repeated request for unchanged content reuses the last result.
+- Code a plugin writes to a separate file, such as a bundled client runtime, is not included. Point imports like the client's `importPath` at a package.
+- Properties of operation types don't link to the spec, and renaming a property doesn't rename its key.
+- A changed spec runs a full Kubb build: about 0.4 s for a 10 KB spec and 2.6 s for a 1.4 MB spec.
 
 ## Supporting Kubb
 
