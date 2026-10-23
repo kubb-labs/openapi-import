@@ -42,7 +42,7 @@ export async function loadProjectConfig(dir: string): Promise<ProjectConfig> {
 
   const identity = createHash('sha256').update(readFileSync(file)).digest('hex')
   try {
-    return { dir, configs: await loadConfigFile<UserConfig>(file, {}), watchedFiles, identity }
+    return { dir, configs: await loadConfigFile<UserConfig>({ file, cli: {} }), watchedFiles, identity }
   } catch (error) {
     return { dir, configs: [], watchedFiles, identity, error: `${file} failed to load: ${error instanceof Error ? error.message : String(error)}` }
   }
