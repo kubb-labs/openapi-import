@@ -8,6 +8,9 @@ import { parseDocument } from 'yaml'
 import { createLocator } from './locate.ts'
 import { createMappings, type Segment, type Targets } from './mappings.ts'
 
+/** Spec files the mapper generates code for: `openapi.yaml` and `*.openapi.yaml`, also as `.yml`. */
+const specFilePattern = /(?:^|[\\/.])openapi\.ya?ml$/
+
 /**
  * Parameters of the content mapper `transform` request.
  */
@@ -62,6 +65,9 @@ function keepSpecCasing(config: UserConfig): UserConfig {
  * diagnostics and the mappings.
  */
 export async function transform({ fileName, content }: TransformParams, config?: UserConfig): Promise<TransformResult> {
+  // A `.yaml` extension in tsconfig sends every YAML file here, such as `docker-compose.yaml`.
+  if (!specFilePattern.test(fileName)) return { text: 'export {}', extension: '.ts' }
+
   const document = parseDocument(content)
   if (document.errors.length) {
     return {

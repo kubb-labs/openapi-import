@@ -31,6 +31,17 @@ describe('transform', () => {
     expect(mapped).toContain('petSchema')
   })
 
+  test('maps openapi.yaml and *.openapi.yaml and leaves other YAML files empty', async () => {
+    const content = await readFile(fileName, 'utf8')
+    const named = await transform({ fileName: path.join(path.dirname(fileName), 'pet.openapi.yml'), content })
+    const other = await transform({ fileName: path.join(path.dirname(fileName), 'docker-compose.yaml'), content: 'services: {}' })
+    const lookalike = await transform({ fileName: path.join(path.dirname(fileName), 'myopenapi.yaml'), content })
+
+    expect(named.text).toContain('export type Pet = {')
+    expect(other).toEqual({ text: 'export {}', extension: '.ts' })
+    expect(lookalike).toEqual({ text: 'export {}', extension: '.ts' })
+  })
+
   test('reports a kubb.config.ts that generates no code', async () => {
     const result = await transform({ fileName, content: await readFile(fileName, 'utf8') }, { output: { path: '.' }, plugins: [] })
 

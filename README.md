@@ -31,15 +31,13 @@ pnpm add -D kubb openapi-import typescript@beta @kubb/plugin-ts
 
 With npm, `tsc` runs TypeScript 6, because `@typescript/typescript6` links its `tsc` over the one from `typescript`. Run `node node_modules/typescript/bin/tsc` instead.
 
-Register the `.yaml` and `.yml` extensions in `tsconfig.json`. `.json` can't be mapped.
+Register the `.yaml` and `.yml` extensions in `tsconfig.json`, and name the spec `openapi.yaml` or `<name>.openapi.yaml`. `.json` can't be mapped.
 
 ```json
 {
   "contentMappers": [{ "package": "openapi-import", "extensions": [".yaml", ".yml"] }]
 }
 ```
-
-This also sends other `.yaml` files TypeScript loads, such as `docker-compose.yaml`, to the mapper. To avoid that, name your specs `*.openapi.yaml` and register `.openapi.yaml` and `.openapi.yml` instead. At run time, `unplugin-kubb` only loads `*.openapi.yaml` and `*.openapi.yml` files.
 
 Add the plugins you want to `kubb.config.ts`, and install them, such as `@kubb/plugin-zod` and `zod`:
 
