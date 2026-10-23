@@ -11,15 +11,15 @@ const pet: Pet = { name: 'Rex', photoUrls: [] }
 It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/pull/4712). TypeScript 7.1 calls it for each spec file and type-checks the `@kubb/plugin-ts` output in its place.
 
 > [!WARNING]
-> Experimental. Content mappers need a TypeScript 7.1 build that supports `--runExternalCode` (`typescript@next` today). Imports are type-only: content-mapped files are not emitted to JavaScript, so values such as enum objects do not exist at run time.
+> Experimental. Content mappers need a TypeScript 7.1 build that supports `--runExternalCode` (`typescript@beta`, 7.1.0-beta or later). Imports are type-only: content-mapped files are not emitted to JavaScript, so values such as enum objects do not exist at run time.
 
 ## Setup
 
 ```bash
-pnpm add -D kubb openapi-import typescript@next
+pnpm add -D kubb openapi-import typescript@beta
 ```
 
-npm rejects `typescript@next` against the `typescript@^7.0.2` peer range of `@kubb/plugin-ts`, so add `--legacy-peer-deps` there.
+With npm, `npx tsc` and `tsc` in package scripts run TypeScript 6. `openapi-import` and `@kubb/parser-ts` depend on `@typescript/typescript6`, which installs TypeScript 6 as `@typescript/old`, and npm links its `tsc` over the one from `typescript`. Run `node node_modules/typescript/bin/tsc` instead. pnpm does not have this problem.
 
 Name your specs with an `.openapi.yaml` extension, such as `petStore.openapi.yaml`, and register that extension in `tsconfig.json`:
 
