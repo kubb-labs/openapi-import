@@ -77,11 +77,10 @@ export async function transform({ fileName, content }: TransformParams, config?:
     if (node.name) targets.schemas.set(resolver.name(node.name), node.name)
   })
   hooks.hook('kubb:generate:operation', (node, { resolver }) => {
-    if ('path' in node && node.path && node.method) {
-      // Operation types are always PascalCase, whatever casing a schema type keeps.
-      const target = { path: node.path, method: node.method }
-      targets.operations.set(resolver.name(node.operationId), target).set(resolverTs.name(node.operationId), target)
-    }
+    if (!('path' in node && node.path && node.method)) return
+    // Operation types are always PascalCase, whatever casing a schema type keeps.
+    const target = { path: node.path, method: node.method }
+    targets.operations.set(resolver.name(node.operationId), target).set(resolverTs.name(node.operationId), target)
   })
 
   const { text, errors } = await generateModule({

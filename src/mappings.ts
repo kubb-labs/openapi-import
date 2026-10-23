@@ -74,6 +74,8 @@ function declarationPointers(name: string, { schemas, operations }: Targets): Ar
   return [operationPointer(`#/paths/${escapeToken(path)}/${method.toLowerCase()}`, name.slice(operationPrefix.length))]
 }
 
+const asItems = (element: { name: ts.Identifier; items: boolean } | undefined) => (element && !element.items ? { ...element, items: true } : undefined)
+
 /**
  * The name a type refers to, looking through `T[]`, `Array<T>` and `T | null`.
  */
@@ -83,15 +85,10 @@ function referencedName(type: ts.TypeNode | undefined): { name: ts.Identifier; i
     const members = type.types.filter((member) => !(ts.isLiteralTypeNode(member) && member.literal.kind === ts.SyntaxKind.NullKeyword))
     return members.length === 1 ? referencedName(members[0]) : undefined
   }
-  if (ts.isArrayTypeNode(type)) {
-    const element = referencedName(type.elementType)
-    return element && !element.items ? { ...element, items: true } : undefined
-  }
+  if (ts.isArrayTypeNode(type)) return asItems(referencedName(type.elementType))
   if (!ts.isTypeReferenceNode(type)) return undefined
-  if (ts.isIdentifier(type.typeName) && type.typeName.text === 'Array' && type.typeArguments?.length === 1) {
-    const element = referencedName(type.typeArguments[0])
-    return element && !element.items ? { ...element, items: true } : undefined
-  }
+  const [argument] = type.typeArguments ?? []
+  if (ts.isIdentifier(type.typeName) && type.typeName.text === 'Array' && argument) return asItems(referencedName(argument))
   return ts.isIdentifier(type.typeName) && !type.typeArguments ? { name: type.typeName, items: false } : undefined
 }
 
