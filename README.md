@@ -11,6 +11,18 @@ It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/p
 > [!WARNING]
 > Experimental. It needs TypeScript 7.1.0-beta or later with `--runExternalCode`. TypeScript does not emit the spec to JavaScript, so values such as `petSchema` only exist at run time when a bundler loads the spec with [`unplugin-kubb`](https://github.com/kubb-labs/kubb/tree/main/packages/unplugin-kubb).
 
+## Features
+
+- Import a `.openapi.yaml` spec straight into TypeScript, with no generated files.
+- Works without a config: you get the types from `@kubb/plugin-ts`.
+- Add a `kubb.config.ts` to get Zod schemas, clients and the output of any other Kubb plugin from the same import.
+- Autocomplete and type errors come from the spec.
+- Go to definition, find references and hover jump between the types and the spec.
+- Rename a schema type in TypeScript and the key in the spec is renamed too.
+- Spec errors, such as an unresolved `$ref`, show on the key they point at.
+- `tsc --runExternalCode` reports the same errors in CI.
+- At run time, `unplugin-kubb` loads the same module in Vite, webpack, Rollup and other bundlers.
+
 ## Setup
 
 ```bash
