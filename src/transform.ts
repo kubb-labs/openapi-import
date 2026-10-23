@@ -74,5 +74,13 @@ export async function transform({ fileName, content }: TransformParams, config?:
     }
   }
 
+  if (config && !text) {
+    return {
+      text: 'export {}',
+      extension: '.ts',
+      diagnostics: [{ messageText: 'kubb.config.ts generated no code for this spec. Add a plugin such as pluginTs().', start: 0, length: 0 }],
+    }
+  }
+
   return { text, extension: '.ts', mappings: createMappings(text, content, (pointer) => locate({ pointer }), targets) }
 }

@@ -1,21 +1,25 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { resolve } from 'node:path'
 import type { UserConfig } from '@kubb/core'
-import { findConfigFile, loadConfigFile } from 'unplugin-kubb'
+import { configFileCandidates, findConfigFile, loadConfigFile } from 'unplugin-kubb'
 
 /**
  * A Kubb config found for a TypeScript project, with what TypeScript needs to reload it.
  */
 export type ProjectConfig = {
   /**
-   * Path of the config file, or of the `kubb.config.ts` TypeScript watches for when none exists.
+   * The project folder. Kubb resolves a config's `root` and `input` from here.
    */
-  file: string
+  dir: string
   /**
    * The configs the file exports, empty when there is no config file.
    */
   configs: Array<UserConfig>
+  /**
+   * The config file, plus every file the CLI would pick up in `dir`, so adding one reloads too.
+   */
+  watchedFiles: Array<string>
   /**
    * Changes when the config file changes, so TypeScript transforms its specs again.
    */
@@ -31,13 +35,15 @@ export type ProjectConfig = {
  * exports a function is called with no CLI options.
  */
 export async function loadProjectConfig(dir: string): Promise<ProjectConfig> {
+  dir = resolve(dir)
   const file = findConfigFile(dir)
-  if (!file) return { file: join(resolve(dir), 'kubb.config.ts'), configs: [], identity: 'none' }
+  const watchedFiles = [...new Set([...(file ? [file] : []), ...configFileCandidates(dir)])]
+  if (!file) return { dir, configs: [], watchedFiles, identity: 'none' }
 
   const identity = createHash('sha256').update(readFileSync(file)).digest('hex')
   try {
-    return { file, configs: await loadConfigFile<UserConfig>(file, {}), identity }
+    return { dir, configs: await loadConfigFile<UserConfig>(file, {}), watchedFiles, identity }
   } catch (error) {
-    return { file, configs: [], identity, error: `${file} failed to load: ${error instanceof Error ? error.message : String(error)}` }
+    return { dir, configs: [], watchedFiles, identity, error: `${file} failed to load: ${error instanceof Error ? error.message : String(error)}` }
   }
 }

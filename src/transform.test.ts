@@ -1,11 +1,8 @@
-import { mkdtemp, readFile, rm } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
+import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
-import { selectConfig } from 'unplugin-kubb'
 import { describe, expect, test } from 'vitest'
-import { loadProjectConfig } from './config.ts'
 import { transform } from './transform.ts'
 
 const fileName = path.resolve(import.meta.dirname, '../examples/pet-store/petStore.openapi.yaml')
@@ -34,17 +31,11 @@ describe('transform', () => {
     expect(mapped).toContain('petSchema')
   })
 
-  test('runs plugin-ts when the project has no kubb.config.ts', async () => {
-    const dir = await mkdtemp(path.join(tmpdir(), 'openapi-import-'))
-    const project = await loadProjectConfig(dir)
-    const config = selectConfig(project.configs, fileName, path.dirname(project.file))
-    const result = await transform({ fileName, content: await readFile(fileName, 'utf8') }, config)
-    await rm(dir, { recursive: true, force: true })
+  test('reports a kubb.config.ts that generates no code', async () => {
+    const result = await transform({ fileName, content: await readFile(fileName, 'utf8') }, { output: { path: '.' }, plugins: [] })
 
-    expect(config).toBeUndefined()
-    expect(result.diagnostics).toBeUndefined()
-    expect(result.text).toContain('export type Pet = {')
-    expect(result.text).not.toContain('z.object(')
+    expect(result.text).toBe('export {}')
+    expect(result.diagnostics?.[0]?.messageText).toContain('generated no code')
   })
 
   test('returns an empty module and a diagnostic at the syntax error for an invalid spec', async () => {
