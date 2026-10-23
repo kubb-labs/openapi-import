@@ -10,11 +10,12 @@ const toRange = ([start, end]: yaml.Range): Range => ({ start, end })
 const unescapeToken = (token: string) => token.replaceAll('~1', '/').replaceAll('~0', '~')
 
 /**
- * Walks a JSON pointer through maps and sequences; the range is the last key or item it reached.
+ * Walks a JSON pointer through maps and sequences; the range is the last key or item it reached,
+ * or with `value` the scalar value of that key.
  */
-function findPointer(document: yaml.Document, pointer: string): Range | undefined {
+function findPointer(document: yaml.Document, pointer: string, value = false): Range | undefined {
   const tokens = pointer.replace(/^#/, '').split('/').slice(1).map(unescapeToken)
-  return tokens.reduce<{ node: unknown; range: Range | undefined } | undefined>(
+  const reached = tokens.reduce<{ node: unknown; range: Range | undefined } | undefined>(
     (at, token) => {
       if (yaml.isMap(at?.node)) {
         const pair = at.node.items.find((item) => yaml.isScalar(item.key) && String(item.key.value) === token)
@@ -27,7 +28,9 @@ function findPointer(document: yaml.Document, pointer: string): Range | undefine
       return undefined
     },
     { node: document.contents, range: undefined },
-  )?.range
+  )
+  if (!value) return reached?.range
+  return yaml.isScalar(reached?.node) && reached.node.range ? toRange(reached.node.range) : undefined
 }
 
 /**
@@ -50,6 +53,6 @@ function findRefUsage(document: yaml.Document, ref: string): Range | undefined {
  * `locate` does from the spec text. Reusing the document the build parsed saves a second parse of
  * the spec on every transform. An unresolved `$ref` falls back to its first usage.
  */
-export function createLocator(document: yaml.Document): (location: { pointer: string; ref?: string }) => Range | undefined {
-  return ({ pointer, ref }) => findPointer(document, pointer) ?? (ref ? findRefUsage(document, ref) : undefined)
+export function createLocator(document: yaml.Document): (location: { pointer: string; ref?: string; value?: boolean }) => Range | undefined {
+  return ({ pointer, ref, value }) => findPointer(document, pointer, value) ?? (ref ? findRefUsage(document, ref) : undefined)
 }

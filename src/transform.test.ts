@@ -125,3 +125,66 @@ describe('transform mappings', async () => {
     expect(starts).toStrictEqual([...starts].sort((a, b) => a - b))
   })
 })
+
+describe('transform casing', () => {
+  const content = [
+    'openapi: 3.0.0',
+    'info: { title: Pets, version: "1" }',
+    'paths:',
+    '  /pets/{id}:',
+    '    get:',
+    '      operationId: getPet',
+    '      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]',
+    '      responses:',
+    "        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/pet' } } } }",
+    'components:',
+    '  schemas:',
+    '    pet:',
+    '      type: object',
+    '      properties:',
+    '        owner: { $ref: "#/components/schemas/pet_owner" }',
+    '    pet_owner: { type: object, properties: { name: { type: string } } }',
+    '    class: { type: string }',
+    '',
+  ].join('\n')
+
+  test('names schema types after their spec keys and renames those keys', async () => {
+    const result = await transform({ fileName, content })
+    const rename = (name: string) => (result.mappings ?? []).find(([start, length]) => result.text.slice(start, start + length) === name)
+
+    expect(result.diagnostics).toBeUndefined()
+    expect(result.text).toContain('export type pet = {')
+    expect(result.text).toContain('export type pet_owner = ')
+    expect(result.text).toContain('export type Class = ')
+    expect(rename('pet')![5] & 256).toBe(256)
+    expect(rename('Class')![5] & 256).toBe(0)
+  })
+
+  test('keeps operation types PascalCase and linked to the operation', async () => {
+    const result = await transform({ fileName, content })
+    const mapped = (result.mappings ?? []).map(([start, length, original, originalLength]) => [
+      result.text.slice(start, start + length),
+      content.slice(original, original + originalLength),
+    ])
+
+    expect(result.text).toContain('export type GetPetStatus200 = ')
+    expect(mapped).toContainEqual(['GetPetStatus200', "'200'"])
+  })
+
+  test('keeps casing for a plugin-ts of the Kubb config unless it sets its own resolver', async () => {
+    const result = await transform({ fileName, content }, { output: { path: '.' }, plugins: [pluginTs()] })
+    const custom = await transform({ fileName, content }, { output: { path: '.' }, plugins: [pluginTs({ resolver: { name: (name: string) => `X${name}` } })] })
+
+    expect(result.text).toContain('export type pet = ')
+    expect(custom.text).toContain('export type Xpet = ')
+  })
+
+  test('renames a $ref with the schema type it points at', async () => {
+    const result = await transform({ fileName, content })
+    const refs = (result.mappings ?? [])
+      .filter(([, , , , , features]) => features & 256)
+      .map(([start, length, original, originalLength]) => [result.text.slice(start, start + length), content.slice(original - 21, original + originalLength)])
+
+    expect(refs).toContainEqual(['pet_owner', '#/components/schemas/pet_owner'])
+  })
+})

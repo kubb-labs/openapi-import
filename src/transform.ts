@@ -1,7 +1,8 @@
 import { dirname } from 'node:path'
+import ts from '@typescript/typescript6'
 import type { UserConfig } from 'kubb'
 import { Hookable, type KubbHooks } from 'kubb/kit'
-import { pluginTs } from '@kubb/plugin-ts'
+import { pluginTs, pluginTsName, resolverTs } from '@kubb/plugin-ts'
 import { generateModule } from 'unplugin-kubb'
 import { parseDocument } from 'yaml'
 import { createLocator } from './locate.ts'
@@ -23,6 +24,35 @@ export type TransformResult = {
   extension: '.ts'
   mappings?: Array<Segment>
   diagnostics?: Array<{ messageText: string; start: number; length: number }>
+}
+
+const scanner = ts.createScanner(ts.ScriptTarget.Latest, true)
+
+// A keyword such as `string` or `class` scans as a keyword, not an identifier, so it is not kept.
+function isPlainIdentifier(name: string): boolean {
+  scanner.setText(name)
+  return scanner.scan() === ts.SyntaxKind.Identifier && scanner.getTokenEnd() === name.length
+}
+
+/**
+ * Keeps a name that is already a valid type name as the spec wrote it (`pet`, `PET_STATUS`), so a
+ * schema type matches its key and renames it. Composed names such as `getPetById Status 200` and
+ * keys that are not identifiers keep the `@kubb/plugin-ts` PascalCase.
+ */
+const specName = (name: string) => (isPlainIdentifier(name) ? name : resolverTs.name(name))
+
+/**
+ * Lets `@kubb/plugin-ts` name schema types after their spec keys, unless the config sets its own `resolver.name`.
+ */
+function keepSpecCasing(config: UserConfig): UserConfig {
+  return {
+    ...config,
+    plugins: config.plugins?.map((plugin) =>
+      plugin.name === pluginTsName
+        ? { ...plugin, options: { ...plugin.options, resolver: { name: specName, ...(plugin.options as { resolver?: object })?.resolver } } }
+        : plugin,
+    ),
+  }
 }
 
 /**
@@ -47,13 +77,16 @@ export async function transform({ fileName, content }: TransformParams, config?:
     if (node.name) targets.schemas.set(resolver.name(node.name), node.name)
   })
   hooks.hook('kubb:generate:operation', (node, { resolver }) => {
-    if ('path' in node && node.path && node.method) targets.operations.set(resolver.name(node.operationId), { path: node.path, method: node.method })
+    if (!('path' in node && node.path && node.method)) return
+    // Operation types are always PascalCase, whatever casing a schema type keeps.
+    const target = { path: node.path, method: node.method }
+    targets.operations.set(resolver.name(node.operationId), target).set(resolverTs.name(node.operationId), target)
   })
 
   const { text, errors } = await generateModule({
     root: dirname(fileName),
     input: document.toJS(),
-    config: config ?? { output: { path: '.' }, plugins: [pluginTs()] },
+    config: keepSpecCasing(config ?? { output: { path: '.' }, plugins: [pluginTs()] }),
     hooks,
   })
 
@@ -78,5 +111,9 @@ export async function transform({ fileName, content }: TransformParams, config?:
     }
   }
 
-  return { text, extension: '.ts', mappings: createMappings(text, content, (pointer) => locate({ pointer }), targets) }
+  return {
+    text,
+    extension: '.ts',
+    mappings: createMappings(text, content, { locate: (pointer) => locate({ pointer }), locateValue: (pointer) => locate({ pointer, value: true }) }, targets),
+  }
 }
