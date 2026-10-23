@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import type { UserConfig } from 'kubb'
 import { configFileCandidates, findConfigFile, loadConfigFile } from 'unplugin-kubb'
 
@@ -9,7 +9,8 @@ import { configFileCandidates, findConfigFile, loadConfigFile } from 'unplugin-k
  */
 export type ProjectConfig = {
   /**
-   * The project folder. Kubb resolves a config's `root` and `input` from here.
+   * The folder the config file was found for, which can be a parent of the project. Kubb resolves
+   * a config's `root` and `input` from here, as the CLI does when it runs from that folder.
    */
   dir: string
   /**
@@ -41,9 +42,25 @@ export async function loadProjectConfig(dir: string): Promise<ProjectConfig> {
   if (!file) return { dir, configs: [], watchedFiles, identity: 'none' }
 
   const identity = createHash('sha256').update(readFileSync(file)).digest('hex')
+  let configDir = dir
+  while (!configFileCandidates(configDir).includes(file)) configDir = dirname(configDir)
   try {
-    return { dir, configs: await loadConfigFile<UserConfig>(file, {}), watchedFiles, identity }
+    const configs = await loadConfigFile<UserConfig>(file, {})
+    // `defineConfig` fills in a missing `root` with the cwd of this server, not the config's folder.
+    const withRoot = configs.map((config) => ({ ...config, root: config.root === process.cwd() ? configDir : resolve(configDir, config.root || '.') }))
+    return { dir: configDir, configs: withRoot, watchedFiles, identity }
   } catch (error) {
-    return { dir, configs: [], watchedFiles, identity, error: `${file} failed to load: ${error instanceof Error ? error.message : String(error)}` }
+    return { dir: configDir, configs: [], watchedFiles, identity, error: `${file} failed to load: ${error instanceof Error ? error.message : String(error)}` }
   }
+}
+
+/**
+ * The config for one spec: the one whose `input` is that spec, else the first without an `input`.
+ * A config whose `input` is another spec, such as a parent project's `kubb.config.ts`, does not
+ * apply, so the spec gets plain `@kubb/plugin-ts` instead of that project's plugins.
+ */
+export function selectSpecConfig(configs: Array<UserConfig>, fileName: string, dir: string): UserConfig | undefined {
+  const isSpec = (config: UserConfig) => typeof config.input === 'string' && resolve(dir, config.root || '.', config.input) === resolve(fileName)
+
+  return configs.find(isSpec) ?? configs.find((config) => config.input === undefined)
 }
