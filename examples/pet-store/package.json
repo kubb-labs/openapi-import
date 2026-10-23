@@ -9,7 +9,7 @@
     "typecheck": "tsc --runExternalCode"
   },
   "dependencies": {
-    "kubb": "^5.12.4",
+    "kubb": "^5.12.5",
     "openapi-import": "workspace:*"
   },
   "devDependencies": {

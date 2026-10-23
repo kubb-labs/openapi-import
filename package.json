@@ -62,9 +62,9 @@
     "typecheck:example": "pnpm --filter openapi-import-pet-store typecheck"
   },
   "dependencies": {
-    "@kubb/adapter-oas": "^5.12.4",
-    "@kubb/core": "^5.12.4",
-    "@kubb/parser-ts": "^5.12.4",
+    "@kubb/adapter-oas": "^5.12.5",
+    "@kubb/core": "^5.12.5",
+    "@kubb/parser-ts": "^5.12.5",
     "@kubb/plugin-ts": "^5.0.14",
     "@typescript/typescript6": "^6.0.2",
     "yaml": "^2.9.1"
@@ -74,7 +74,7 @@
     "@changesets/cli": "^3.0.3",
     "@types/node": "22.20.2",
     "@vitest/coverage-v8": "^5.0.5",
-    "kubb": "^5.12.4",
+    "kubb": "^5.12.5",
     "oxfmt": "^0.72.0",
     "oxlint": "^1.88.0",
     "tsdown": "^0.23.1",
@@ -82,7 +82,7 @@
     "vitest": "^5.0.5"
   },
   "peerDependencies": {
-    "kubb": "^5.12.4"
+    "kubb": "^5.12.5"
   },
   "typescript": {
     "contentMapper": {
