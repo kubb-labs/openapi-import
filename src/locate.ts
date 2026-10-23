@@ -9,7 +9,9 @@ const toRange = ([start, end]: yaml.Range): Range => ({ start, end })
 
 const unescapeToken = (token: string) => token.replaceAll('~1', '/').replaceAll('~0', '~')
 
-/** Walks a JSON pointer through maps and sequences; the range is the last key or item it reached. */
+/**
+ * Walks a JSON pointer through maps and sequences; the range is the last key or item it reached.
+ */
 function findPointer(document: yaml.Document, pointer: string): Range | undefined {
   const tokens = pointer.replace(/^#/, '').split('/').slice(1).map(unescapeToken)
   return tokens.reduce<{ node: unknown; range: Range | undefined } | undefined>(
@@ -28,7 +30,9 @@ function findPointer(document: yaml.Document, pointer: string): Range | undefine
   )?.range
 }
 
-/** The first `$ref` whose value is `ref`. */
+/**
+ * The first `$ref` whose value is `ref`.
+ */
 function findRefUsage(document: yaml.Document, ref: string): Range | undefined {
   let found: Range | undefined
   yaml.visit(document, {

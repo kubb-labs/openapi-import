@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from 'vitest'
 import { cacheTransform } from './cache.ts'
 
 describe('cacheTransform', () => {
-  test('reuses the result for the same file, content and options', async () => {
+  test('reuses the result for the same file, content and config', async () => {
     const transform = vi.fn(async ({ content }: { content: string }) => content.toUpperCase())
     const cached = cacheTransform(transform)
 
@@ -11,13 +11,13 @@ describe('cacheTransform', () => {
     expect(transform).toHaveBeenCalledTimes(1)
   })
 
-  test('transforms again when the content or the options change', async () => {
+  test('transforms again when the content or the config changes', async () => {
     const transform = vi.fn(async ({ content }: { content: string }) => content)
     const cached = cacheTransform(transform)
 
     await cached({ fileName: 'a.yaml', content: 'a' })
     await cached({ fileName: 'a.yaml', content: 'b' })
-    await cached({ fileName: 'a.yaml', content: 'b' }, { arrayType: 'generic' })
+    await cached({ fileName: 'a.yaml', content: 'b' }, { output: { path: '.' } })
     expect(transform).toHaveBeenCalledTimes(3)
   })
 

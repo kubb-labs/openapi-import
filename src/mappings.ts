@@ -22,10 +22,12 @@ export type Targets = {
 
 type Locate = (pointer: string) => { start: number; end: number } | undefined
 
+const kindVerbatim = 0
 const kindAlias = 2
-// Hover, Definition, TypeDefinition, Implementation, References, DocumentHighlights. Rename stays off
-// because only verbatim segments can write edits back to the spec.
+// Hover, Definition, TypeDefinition, Implementation, References, DocumentHighlights.
 const features = 1 | 8 | 16 | 32 | 64 | 128
+// Only schema names rename into the spec. A stale `$ref` shows as an error, but a stale `required` entry fails silently.
+const renameFeature = 256
 
 const escapeToken = (token: string) => token.replaceAll('~', '~0').replaceAll('/', '~1')
 
@@ -65,7 +67,9 @@ function declarationPointers(name: string, { schemas, operations }: Targets): Ar
   return [operationPointer(`#/paths/${escapeToken(path)}/${method.toLowerCase()}`, name.slice(operationPrefix.length))]
 }
 
-/** The object literal a property type describes, looking through `T[]` and `Array<T>`. */
+/**
+ * The object literal a property type describes, looking through `T[]` and `Array<T>`.
+ */
 function objectLiteral(type: ts.TypeNode | undefined): { node: ts.TypeLiteralNode; items: boolean } | undefined {
   if (!type) return undefined
   if (ts.isTypeLiteralNode(type)) return { node: type, items: false }
@@ -76,35 +80,42 @@ function objectLiteral(type: ts.TypeNode | undefined): { node: ts.TypeLiteralNod
   return undefined
 }
 
-/** The members of an interface, or of a type alias for an object literal. */
+/**
+ * The members of an interface, or of a type alias for an object literal.
+ */
 function typeMembers(statement: ts.TypeAliasDeclaration | ts.InterfaceDeclaration): ts.NodeArray<ts.TypeElement> | undefined {
   if (ts.isInterfaceDeclaration(statement)) return statement.members
   return ts.isTypeLiteralNode(statement.type) ? statement.type.members : undefined
 }
 
 /**
- * Builds span map segments that link generated declaration and property names to the keys they
- * came from in the spec, so go to definition, hover and find references cross between the two.
- *
- * Declarations of component schemas map to `components.schemas.<name>`, their properties to
- * `properties.<name>` (nested object literals and arrays of them included), and operation types to
- * the operation, its parameters, request body or response. A name `locate` cannot place is left
- * synthesized.
+ * Links generated names to the spec keys they came from: schemas and their (nested) properties,
+ * and operation types to the operation, parameters, request body or response. A schema type named
+ * exactly like its key is verbatim, so a rename in TypeScript renames the key.
  */
-export function createMappings(text: string, locate: Locate, targets: Targets): Array<Segment> {
+export function createMappings(text: string, content: string, locate: Locate, targets: Targets): Array<Segment> {
   const sourceFile = ts.createSourceFile('index.ts', text, ts.ScriptTarget.Latest, true)
   const segments: Array<Segment> = []
 
-  const add = (name: ts.Node, ...pointers: Array<string>) => {
+  const add = (name: ts.Node, rename: boolean, ...pointers: Array<string>) => {
     const range = pointers.map(locate).find(Boolean)
-    if (range) segments.push([name.getStart(sourceFile), name.getWidth(sourceFile), range.start, range.end - range.start, kindAlias, features])
+    if (!range) return
+    const verbatim = rename && content.slice(range.start, range.end) === name.getText(sourceFile)
+    segments.push([
+      name.getStart(sourceFile),
+      name.getWidth(sourceFile),
+      range.start,
+      range.end - range.start,
+      verbatim ? kindVerbatim : kindAlias,
+      verbatim ? features | renameFeature : features,
+    ])
   }
 
   const addMembers = (members: ts.NodeArray<ts.TypeElement>, pointer: string) => {
     for (const member of members) {
       if (!ts.isPropertySignature(member) || !(ts.isIdentifier(member.name) || ts.isStringLiteral(member.name))) continue
       const propertyPointer = `${pointer}/properties/${escapeToken(member.name.text)}`
-      add(member.name, propertyPointer)
+      add(member.name, false, propertyPointer)
       const literal = objectLiteral(member.type)
       if (literal) addMembers(literal.node.members, literal.items ? `${propertyPointer}/items` : propertyPointer)
     }
@@ -116,17 +127,18 @@ export function createMappings(text: string, locate: Locate, targets: Targets): 
       for (const declaration of statement.declarationList.declarations) {
         if (!ts.isIdentifier(declaration.name)) continue
         const name = declaration.name.text
-        add(declaration.name, ...declarationPointers(name[0]!.toUpperCase() + name.slice(1), targets))
+        add(declaration.name, false, ...declarationPointers(name, targets), ...declarationPointers(name[0]!.toUpperCase() + name.slice(1), targets))
       }
       continue
     }
     if (!ts.isTypeAliasDeclaration(statement) && !ts.isInterfaceDeclaration(statement)) continue
     const pointers = declarationPointers(statement.name.text, targets)
-    add(statement.name, ...pointers)
+    const isSchema = targets.schemas.has(statement.name.text)
+    add(statement.name, isSchema, ...pointers)
 
     // Property names only resolve under a schema, not under operation parameters or responses.
     const pointer = pointers[0]
-    if (!pointer || !targets.schemas.has(statement.name.text)) continue
+    if (!pointer || !isSchema) continue
     const members = typeMembers(statement)
     if (members) addMembers(members, pointer)
   }

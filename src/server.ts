@@ -1,5 +1,7 @@
+import { dirname } from 'node:path'
+import { selectConfig } from 'unplugin-kubb'
 import { cacheTransform } from './cache.ts'
-import { type Options, parseOptions } from './options.ts'
+import { loadProjectConfig, type ProjectConfig } from './config.ts'
 import { createDecoder, encode, type Message } from './rpc.ts'
 import { transform, type TransformParams } from './transform.ts'
 
@@ -8,23 +10,36 @@ import { transform, type TransformParams } from './transform.ts'
 const writeProtocol = process.stdout.write.bind(process.stdout)
 process.stdout.write = process.stderr.write.bind(process.stderr) as typeof process.stdout.write
 
-const projects = new Map<string, Options>()
+// The load promise is stored right away, so a transform sent before the load finishes waits for it.
+const projects = new Map<string, Promise<ProjectConfig>>()
 
 const cachedTransform = cacheTransform(transform)
 
 const handlers: Record<string, (params: never) => unknown> = {
   initialize: () => ({ protocolVersion: 1, positionEncoding: 'utf-16', diagnosticSource: 'kubb' }),
-  openProject: ({ projectHandle, options }: { projectHandle: string; options?: unknown }) => {
-    const parsed = parseOptions(options)
-    projects.set(projectHandle, parsed.options)
+  // `dynamicConfig` in package.json: TypeScript watches `watchedFiles` and opens the project again
+  // when one changes, then transforms its specs again when `configIdentity` differs.
+  openProject: async ({ projectHandle, configFileName, options }: { projectHandle: string; configFileName?: string; options?: unknown }) => {
+    const loading = loadProjectConfig(configFileName ? dirname(configFileName) : process.cwd())
+    projects.set(projectHandle, loading)
+    const project = await loading
 
-    return parsed.diagnostics.length ? { optionDiagnostics: parsed.diagnostics } : {}
+    return {
+      configIdentity: project.identity,
+      watchedFiles: project.watchedFiles,
+      ...(options != null && { optionDiagnostics: [{ path: [], messageText: 'openapi-import has no options. Set plugin options in kubb.config.ts.' }] }),
+    }
   },
   closeProject: ({ projectHandle }: { projectHandle: string }) => {
     projects.delete(projectHandle)
     return null
   },
-  transform: (params: TransformParams & { projectHandle: string }) => cachedTransform(params, projects.get(params.projectHandle)),
+  transform: async (params: TransformParams & { projectHandle: string }) => {
+    const project = await projects.get(params.projectHandle)
+    if (project?.error) return { text: 'export {}', extension: '.ts', diagnostics: [{ messageText: project.error, start: 0, length: 0 }] }
+
+    return cachedTransform(params, project && selectConfig(project.configs, params.fileName, project.dir))
+  },
 }
 
 async function handle({ id, method = '', params }: Message): Promise<void> {
