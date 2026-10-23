@@ -5,7 +5,7 @@ import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 import { transform } from './transform.ts'
 
-const fileName = path.resolve(import.meta.dirname, '../examples/pet-store/petStore.openapi.yaml')
+const fileName = path.resolve(import.meta.dirname, '../examples/pet-store/openapi.yaml')
 
 describe('transform', () => {
   test('returns the plugin-ts types of a spec as one module', async () => {

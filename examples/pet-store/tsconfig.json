@@ -10,7 +10,7 @@
   "contentMappers": [
     {
       "package": "openapi-import",
-      "extensions": [".openapi.yaml", ".openapi.yml"]
+      "extensions": [".yaml", ".yml"]
     }
   ],
   "include": ["./src/**/*", "./kubb.config.ts"]
