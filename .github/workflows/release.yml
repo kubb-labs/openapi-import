@@ -1,0 +1,103 @@
+name: Release
+on:
+  workflow_dispatch:
+  push:
+    branches: ['main']
+    paths:
+      - '.changeset/**'
+      - 'src/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/release.yml'
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release
+    if: github.repository_owner == 'kubb-labs'
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    # id-token: write enables npm OIDC trusted publishing — no NPM_TOKEN needed.
+    permissions:
+      contents: write
+      id-token: write
+      packages: write
+      pull-requests: write
+      issues: write
+    outputs:
+      staged: ${{ steps.release.outputs.staged }}
+      staged_packages: ${{ steps.release.outputs.staged_packages }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Tools
+        uses: kubb-labs/config/.github/setup@343e250ace24b6ee7e9694e9e06a594aeb8e01c3 # main
+        with:
+          cache: 'false'
+          force-install: 'true'
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Test
+        run: pnpm run test
+
+      - name: Release
+        id: release
+        uses: kubb-labs/config/.github/actions/release@343e250ace24b6ee7e9694e9e06a594aeb8e01c3 # main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Canary skips staging on purpose, so it stays automatic on every push.
+      - name: Publish canary
+        if: ${{ steps.release.outputs.staged != 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        continue-on-error: true
+        shell: bash
+        env:
+          NPM_CONFIG_PROVENANCE: true
+        # Stamp a unique canary version so it can't collide with the `latest` tag.
+        run: |
+          pnpm --no-git-tag-version version minor --no-git-checks
+          version=$(node -p "require('./package.json').version")
+          canary_version="${version}-canary.$(date +%Y%m%dT%H%M%S)"
+          echo "Version that will be published: ${canary_version}"
+          pnpm --no-git-tag-version version "${canary_version}" --allow-same-version --no-git-checks
+          pnpm run build
+          pnpm exec changeset publish --tag canary
+
+  promote:
+    name: Promote staged release
+    needs: [release]
+    if: ${{ needs.release.outputs.staged == 'true' }}
+    environment:
+      name: npm-release-approval
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # gh release create
+      issues: write # release comments on issues
+      pull-requests: write # release comments on PRs
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Tools
+        uses: kubb-labs/config/.github/setup@343e250ace24b6ee7e9694e9e06a594aeb8e01c3 # main
+        with:
+          cache: 'false'
+
+      - name: Promote
+        uses: kubb-labs/config/.github/actions/promote@343e250ace24b6ee7e9694e9e06a594aeb8e01c3 # main
+        with:
+          staged-packages: ${{ needs.release.outputs.staged_packages }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
