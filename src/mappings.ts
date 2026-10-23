@@ -25,7 +25,7 @@ type Locate = (pointer: string) => { start: number; end: number } | undefined
 /**
  * Finds a spec key (`locate`) or the scalar value of a key (`locateValue`) from a JSON pointer.
  */
-export type Locators = { locate: Locate; locateValue: Locate }
+type Locators = { locate: Locate; locateValue: Locate }
 
 const kindVerbatim = 0
 const kindAlias = 2
@@ -187,5 +187,5 @@ export function createMappings(text: string, content: string, { locate, locateVa
     else if (ts.isTypeAliasDeclaration(statement)) addRef(statement.type, pointer)
   }
 
-  return segments.sort((a, b) => a[0] - b[0])
+  return segments
 }

@@ -66,7 +66,7 @@ VS Code only passes `--runExternalCode` in trusted workspaces.
 
 ## Editor support
 
-Go to definition, find references and hover link generated names to their keys in the spec. Schema types are named like their keys, so `pet` stays `pet` and `Pet` stays `Pet`. Renaming one renames the key and the `$ref`s that point at it, when they sit on a property, an array item or a schema alias. Other `$ref`s, such as inside `allOf` or a response, are not renamed.
+Go to definition, find references and hover link generated names to their keys in the spec. Schema types are named like their keys. Renaming one renames the key and the `$ref`s that point at it, when they sit on a property, an array item or a schema alias. Other `$ref`s, such as inside `allOf` or a response, are not renamed.
 
 | Generated name                                                | Jumps to                                                                  |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------- |
