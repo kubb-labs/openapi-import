@@ -13,6 +13,6 @@
     "openapi-import": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "7.1.0-dev.20261022.1"
+    "typescript": "7.1.0-beta"
   }
 }
