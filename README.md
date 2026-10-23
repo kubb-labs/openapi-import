@@ -18,7 +18,7 @@ It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/p
 - Add a `kubb.config.ts` to get Zod schemas, clients and the output of any other Kubb plugin from the same import.
 - Autocomplete and type errors come from the spec.
 - Go to definition, find references and hover jump between the types and the spec.
-- Rename a schema type in TypeScript and the key in the spec is renamed too.
+- Rename a schema type in TypeScript and the key and its `$ref`s in the spec are renamed too.
 - Spec errors, such as an unresolved `$ref`, show on the key they point at.
 - `tsc --runExternalCode` reports the same errors in CI.
 - At run time, `unplugin-kubb` loads the same module in Vite, webpack, Rollup and other bundlers.
@@ -66,7 +66,7 @@ VS Code only passes `--runExternalCode` in trusted workspaces.
 
 ## Editor support
 
-Go to definition, find references and hover link generated names to their keys in the spec. Renaming a schema type named like its key, such as `Pet`, renames the key too. Update the `$ref`s to it yourself.
+Go to definition, find references and hover link generated names to their keys in the spec. Schema types are named like their keys, so `pet` stays `pet` and `Pet` stays `Pet`. Renaming one renames the key and the `$ref`s that point at it, when they sit on a property, an array item or a schema alias. Other `$ref`s, such as inside `allOf` or a response, are not renamed.
 
 | Generated name                                                | Jumps to                                                                  |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------- |
