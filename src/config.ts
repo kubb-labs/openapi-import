@@ -9,7 +9,7 @@ import { configFileCandidates, findConfigFile, loadConfigFile } from 'unplugin-k
  */
 export type ProjectConfig = {
   /**
-   * The project folder. `loadConfigFile` resolves each config's `root` from the config file's folder.
+   * The project folder.
    */
   dir: string
   /**
