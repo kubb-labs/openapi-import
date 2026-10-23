@@ -1,6 +1,7 @@
 import { dirname } from 'node:path'
+import { selectConfig } from 'unplugin-kubb'
 import { cacheTransform } from './cache.ts'
-import { loadProjectConfig, type ProjectConfig, selectSpecConfig } from './config.ts'
+import { loadProjectConfig, type ProjectConfig } from './config.ts'
 import { createDecoder, encode, type Message } from './rpc.ts'
 import { transform, type TransformParams } from './transform.ts'
 
@@ -37,7 +38,7 @@ const handlers: Record<string, (params: never) => unknown> = {
     const project = await projects.get(params.projectHandle)
     if (project?.error) return { text: 'export {}', extension: '.ts', diagnostics: [{ messageText: project.error, start: 0, length: 0 }] }
 
-    return cachedTransform(params, project && selectSpecConfig(project.configs, params.fileName, project.dir))
+    return cachedTransform(params, project && selectConfig(project.configs, params.fileName, project.dir))
   },
 }
 
