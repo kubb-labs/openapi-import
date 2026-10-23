@@ -63,7 +63,7 @@ export async function transform({ fileName, content }: TransformParams, config?:
 
   const locate = createLocator(document)
 
-  if (text === null) {
+  if (errors.length) {
     return {
       text: 'export {}',
       extension: '.ts',
