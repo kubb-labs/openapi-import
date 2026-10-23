@@ -2,7 +2,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
-import { loadProjectConfig, selectConfig } from './config.ts'
+import { loadProjectConfig } from './config.ts'
 
 describe('loadProjectConfig', () => {
   let dir = ''
@@ -34,18 +34,5 @@ describe('loadProjectConfig', () => {
 
     expect(config.configs).toStrictEqual([])
     expect(config.error).toContain('broken config')
-  })
-})
-
-describe('selectConfig', () => {
-  const file = '/app/kubb.config.ts'
-
-  test('picks the config whose input is the spec, else the first', () => {
-    const pets = { input: './specs/pet.openapi.yaml', output: { path: './gen' } }
-    const stores = { input: './specs/store.openapi.yaml', output: { path: './gen' } }
-
-    expect(selectConfig({ file, configs: [pets, stores] }, '/app/specs/store.openapi.yaml')).toBe(stores)
-    expect(selectConfig({ file, configs: [pets, stores] }, '/app/other.openapi.yaml')).toBe(pets)
-    expect(selectConfig({ file, configs: [] }, '/app/specs/pet.openapi.yaml')).toBeUndefined()
   })
 })

@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { join, resolve } from 'node:path'
 import type { UserConfig } from '@kubb/core'
 import { findConfigFile, loadConfigFile } from 'unplugin-kubb'
 
@@ -40,14 +40,4 @@ export async function loadProjectConfig(dir: string): Promise<ProjectConfig> {
   } catch (error) {
     return { file, configs: [], identity, error: `${file} failed to load: ${error instanceof Error ? error.message : String(error)}` }
   }
-}
-
-/**
- * The config whose `input` is `fileName`, else the first one. `input` and `root` resolve from
- * the config file's folder, as the Kubb CLI resolves them.
- */
-export function selectConfig({ file, configs }: Pick<ProjectConfig, 'file' | 'configs'>, fileName: string): UserConfig | undefined {
-  const matches = (config: UserConfig) => typeof config.input === 'string' && resolve(dirname(file), config.root ?? '.', config.input) === resolve(fileName)
-
-  return configs.find(matches) ?? configs[0]
 }
