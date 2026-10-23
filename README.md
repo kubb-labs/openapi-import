@@ -95,26 +95,6 @@ Generated names link back to the keys they came from in the spec. Go to definiti
 
 Spec errors, such as an unresolved `$ref`, show on the key or value they point at.
 
-## Options
-
-Set options on the `contentMappers` entry. They apply only without a `kubb.config.ts`; with one, set plugin options there. TypeScript reports an unknown key or an invalid value on `tsconfig.json`.
-
-```json
-{
-  "contentMappers": [
-    {
-      "package": "openapi-import",
-      "extensions": [".openapi.yaml"],
-      "options": { "arrayType": "generic" }
-    }
-  ]
-}
-```
-
-| Option      | Values                 | Default   | Description                                                              |
-| ----------- | ---------------------- | --------- | ------------------------------------------------------------------------ |
-| `arrayType` | `'array'`, `'generic'` | `'array'` | Prints arrays as `T[]` or `Array<T>`, like the `@kubb/plugin-ts` option. |
-
 See [`examples/pet-store`](./examples/pet-store) for a working setup.
 
 ## Limits

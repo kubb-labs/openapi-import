@@ -2,7 +2,6 @@ import { dirname } from 'node:path'
 import { selectConfig } from 'unplugin-kubb'
 import { cacheTransform } from './cache.ts'
 import { loadProjectConfig, type ProjectConfig } from './config.ts'
-import { type Options, parseOptions } from './options.ts'
 import { createDecoder, encode, type Message } from './rpc.ts'
 import { transform, type TransformParams } from './transform.ts'
 
@@ -11,7 +10,7 @@ import { transform, type TransformParams } from './transform.ts'
 const writeProtocol = process.stdout.write.bind(process.stdout)
 process.stdout.write = process.stderr.write.bind(process.stderr) as typeof process.stdout.write
 
-const projects = new Map<string, { options: Options; config: ProjectConfig }>()
+const projects = new Map<string, ProjectConfig>()
 
 const cachedTransform = cacheTransform(transform)
 
@@ -19,16 +18,11 @@ const handlers: Record<string, (params: never) => unknown> = {
   initialize: () => ({ protocolVersion: 1, positionEncoding: 'utf-16', diagnosticSource: 'kubb' }),
   // `dynamicConfig` in package.json: TypeScript watches `watchedFiles` and opens the project again
   // when one changes, then transforms its specs again when `configIdentity` differs.
-  openProject: async ({ projectHandle, configFileName, options }: { projectHandle: string; configFileName?: string; options?: unknown }) => {
-    const parsed = parseOptions(options)
-    const config = await loadProjectConfig(configFileName ? dirname(configFileName) : process.cwd())
-    projects.set(projectHandle, { options: parsed.options, config })
+  openProject: async ({ projectHandle, configFileName }: { projectHandle: string; configFileName?: string }) => {
+    const project = await loadProjectConfig(configFileName ? dirname(configFileName) : process.cwd())
+    projects.set(projectHandle, project)
 
-    return {
-      configIdentity: config.identity,
-      watchedFiles: [config.file],
-      ...(parsed.diagnostics.length ? { optionDiagnostics: parsed.diagnostics } : {}),
-    }
+    return { configIdentity: project.identity, watchedFiles: [project.file] }
   },
   closeProject: ({ projectHandle }: { projectHandle: string }) => {
     projects.delete(projectHandle)
@@ -36,12 +30,9 @@ const handlers: Record<string, (params: never) => unknown> = {
   },
   transform: async (params: TransformParams & { projectHandle: string }) => {
     const project = projects.get(params.projectHandle)
-    if (project?.config.error) return { text: 'export {}', extension: '.ts', diagnostics: [{ messageText: project.config.error, start: 0, length: 0 }] }
+    if (project?.error) return { text: 'export {}', extension: '.ts', diagnostics: [{ messageText: project.error, start: 0, length: 0 }] }
 
-    return cachedTransform(params, {
-      ...project?.options,
-      config: project && selectConfig(project.config.configs, params.fileName, dirname(project.config.file)),
-    })
+    return cachedTransform(params, project && selectConfig(project.configs, params.fileName, dirname(project.file)))
   },
 }
 

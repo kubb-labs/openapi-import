@@ -24,7 +24,7 @@ describe('transform', () => {
       output: { path: './gen' },
       plugins: [pluginTs({ output: { path: 'types' }, group: { type: 'tag' } }), pluginZod({ output: { path: 'zod' } })],
     }
-    const result = await transform({ fileName, content: await readFile(fileName, 'utf8') }, { config })
+    const result = await transform({ fileName, content: await readFile(fileName, 'utf8') }, config)
     const mapped = (result.mappings ?? []).map(([start, length]) => result.text.slice(start, start + length))
 
     expect(result.diagnostics).toBeUndefined()
@@ -34,24 +34,17 @@ describe('transform', () => {
     expect(mapped).toContain('petSchema')
   })
 
-  test('runs plugin-ts with the tsconfig options when the project has no kubb.config.ts', async () => {
+  test('runs plugin-ts when the project has no kubb.config.ts', async () => {
     const dir = await mkdtemp(path.join(tmpdir(), 'openapi-import-'))
     const project = await loadProjectConfig(dir)
     const config = selectConfig(project.configs, fileName, path.dirname(project.file))
-    const result = await transform({ fileName, content: await readFile(fileName, 'utf8') }, { arrayType: 'generic', config })
+    const result = await transform({ fileName, content: await readFile(fileName, 'utf8') }, config)
     await rm(dir, { recursive: true, force: true })
 
     expect(config).toBeUndefined()
     expect(result.diagnostics).toBeUndefined()
-    expect(result.text).toContain('photoUrls: Array<string>')
+    expect(result.text).toContain('export type Pet = {')
     expect(result.text).not.toContain('z.object(')
-  })
-
-  test('prints arrays as `Array<T>` with `arrayType: generic`', async () => {
-    const content = await readFile(fileName, 'utf8')
-
-    expect((await transform({ fileName, content })).text).toContain('photoUrls: string[]')
-    expect((await transform({ fileName, content }, { arrayType: 'generic' })).text).toContain('photoUrls: Array<string>')
   })
 
   test('returns an empty module and a diagnostic at the syntax error for an invalid spec', async () => {

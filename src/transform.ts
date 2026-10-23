@@ -5,7 +5,6 @@ import { generateModule } from 'unplugin-kubb'
 import { parseDocument } from 'yaml'
 import { createLocator } from './locate.ts'
 import { createMappings, type Segment, type Targets } from './mappings.ts'
-import type { Options } from './options.ts'
 
 /**
  * Parameters of the content mapper `transform` request.
@@ -13,13 +12,6 @@ import type { Options } from './options.ts'
 export type TransformParams = {
   fileName: string
   content: string
-}
-
-/**
- * Options from `tsconfig.json`, plus the Kubb config found for the project.
- */
-export type TransformSettings = Options & {
-  config?: UserConfig
 }
 
 /**
@@ -36,15 +28,14 @@ export type TransformResult = {
 /**
  * Generates the output of every plugin in the project's `kubb.config.ts` for one OpenAPI
  * document as a single module, through `generateModule` from `unplugin-kubb`, so a bundler
- * importing the spec gets the same exports. Without a config, only `@kubb/plugin-ts` runs, with
- * `arrayType`.
+ * importing the spec gets the same exports. Without a config, only `@kubb/plugin-ts` runs.
  *
  * The spec text comes from the request, not the disk, so unsaved editor changes are typed too.
  * It is parsed once: Kubb builds from the parsed object, and the same document places diagnostics
  * and mappings. Nothing is written: the build runs into a memory storage. A failed build returns
  * an empty module with the error-level diagnostics placed on the spec key they point at.
  */
-export async function transform({ fileName, content }: TransformParams, { arrayType, config }: TransformSettings = {}): Promise<TransformResult> {
+export async function transform({ fileName, content }: TransformParams, config?: UserConfig): Promise<TransformResult> {
   const document = parseDocument(content)
   if (document.errors.length) {
     return {
@@ -66,7 +57,7 @@ export async function transform({ fileName, content }: TransformParams, { arrayT
   const { text, errors } = await generateModule({
     root: dirname(fileName),
     input: document.toJS(),
-    config: config ?? { output: { path: '.' }, plugins: [pluginTs({ arrayType })] },
+    config: config ?? { output: { path: '.' }, plugins: [pluginTs()] },
     hooks,
   })
 
