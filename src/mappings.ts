@@ -74,35 +74,20 @@ function declarationPointers(name: string, { schemas, operations }: Targets): Ar
   return [operationPointer(`#/paths/${escapeToken(path)}/${method.toLowerCase()}`, name.slice(operationPrefix.length))]
 }
 
-const asItems = (element: { name: ts.Identifier; items: boolean } | undefined) => (element && !element.items ? { ...element, items: true } : undefined)
-
 /**
- * The name a type refers to, looking through `T[]`, `Array<T>` and `T | null`.
+ * A property type without `| null` and one level of `T[]` or `Array<T>`, which the spec writes under `items`.
  */
-function referencedName(type: ts.TypeNode | undefined): { name: ts.Identifier; items: boolean } | undefined {
-  if (!type) return undefined
-  if (ts.isUnionTypeNode(type)) {
-    const members = type.types.filter((member) => !(ts.isLiteralTypeNode(member) && member.literal.kind === ts.SyntaxKind.NullKeyword))
-    return members.length === 1 ? referencedName(members[0]) : undefined
-  }
-  if (ts.isArrayTypeNode(type)) return asItems(referencedName(type.elementType))
-  if (!ts.isTypeReferenceNode(type)) return undefined
-  const [argument] = type.typeArguments ?? []
-  if (ts.isIdentifier(type.typeName) && type.typeName.text === 'Array' && argument) return asItems(referencedName(argument))
-  return ts.isIdentifier(type.typeName) && !type.typeArguments ? { name: type.typeName, items: false } : undefined
-}
-
-/**
- * The object literal a property type describes, looking through `T[]` and `Array<T>`.
- */
-function objectLiteral(type: ts.TypeNode | undefined): { node: ts.TypeLiteralNode; items: boolean } | undefined {
-  if (!type) return undefined
-  if (ts.isTypeLiteralNode(type)) return { node: type, items: false }
-  if (ts.isArrayTypeNode(type) && ts.isTypeLiteralNode(type.elementType)) return { node: type.elementType, items: true }
-  if (ts.isTypeReferenceNode(type) && type.typeName.getText() === 'Array' && type.typeArguments?.[0] && ts.isTypeLiteralNode(type.typeArguments[0])) {
-    return { node: type.typeArguments[0], items: true }
-  }
-  return undefined
+function unwrap(type: ts.TypeNode | undefined): { type: ts.TypeNode; items: boolean } | undefined {
+  const members =
+    type && ts.isUnionTypeNode(type)
+      ? type.types.filter((member) => !(ts.isLiteralTypeNode(member) && member.literal.kind === ts.SyntaxKind.NullKeyword))
+      : [type]
+  const [single] = members.length === 1 ? members : []
+  if (!single) return undefined
+  if (ts.isArrayTypeNode(single)) return { type: single.elementType, items: true }
+  if (ts.isTypeReferenceNode(single) && single.typeName.getText() === 'Array' && single.typeArguments?.length === 1)
+    return { type: single.typeArguments[0]!, items: true }
+  return { type: single, items: false }
 }
 
 /**
@@ -138,16 +123,17 @@ export function createMappings(text: string, content: string, { locate, locateVa
   }
 
   // Only a reference whose `$ref` ends in the same text renames; anything else would break the spec.
-  const addRef = (type: ts.TypeNode | undefined, pointer: string) => {
-    const reference = referencedName(type)
-    if (!reference || !targets.schemas.has(reference.name.text)) return
-    const range = locateValue(`${pointer}${reference.items ? '/items' : ''}/$ref`)
+  const addRef = (inner: ReturnType<typeof unwrap>, pointer: string) => {
+    if (!inner || !ts.isTypeReferenceNode(inner.type) || !ts.isIdentifier(inner.type.typeName)) return
+    const reference = inner.type.typeName
+    const name = reference.text
+    if (!targets.schemas.has(name)) return
+    const range = locateValue(`${pointer}${inner.items ? '/items' : ''}/$ref`)
     if (!range) return
-    const name = reference.name.text
     // The `$ref` value may be quoted, so count the name back from the end of its text.
     const start = range.start + content.slice(range.start, range.end).replace(/['"]$/, '').length - name.length
     if (content.slice(start - refPrefix.length, start + name.length) !== refPrefix + name) return
-    segments.push([reference.name.getStart(sourceFile), reference.name.getWidth(sourceFile), start, name.length, kindVerbatim, features | renameFeature])
+    segments.push([reference.getStart(sourceFile), reference.getWidth(sourceFile), start, name.length, kindVerbatim, features | renameFeature])
   }
 
   const addMembers = (members: ts.NodeArray<ts.TypeElement>, pointer: string) => {
@@ -155,9 +141,9 @@ export function createMappings(text: string, content: string, { locate, locateVa
       if (!ts.isPropertySignature(member) || !(ts.isIdentifier(member.name) || ts.isStringLiteral(member.name))) continue
       const propertyPointer = `${pointer}/properties/${escapeToken(member.name.text)}`
       add(member.name, false, propertyPointer)
-      addRef(member.type, propertyPointer)
-      const literal = objectLiteral(member.type)
-      if (literal) addMembers(literal.node.members, literal.items ? `${propertyPointer}/items` : propertyPointer)
+      const inner = unwrap(member.type)
+      addRef(inner, propertyPointer)
+      if (inner && ts.isTypeLiteralNode(inner.type)) addMembers(inner.type.members, inner.items ? `${propertyPointer}/items` : propertyPointer)
     }
   }
 
@@ -181,7 +167,7 @@ export function createMappings(text: string, content: string, { locate, locateVa
     if (!pointer || !isSchema) continue
     const members = typeMembers(statement)
     if (members) addMembers(members, pointer)
-    else if (ts.isTypeAliasDeclaration(statement)) addRef(statement.type, pointer)
+    else if (ts.isTypeAliasDeclaration(statement)) addRef(unwrap(statement.type), pointer)
   }
 
   return segments
