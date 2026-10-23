@@ -1,8 +1,6 @@
 import * as yaml from 'yaml'
 
-/**
- * A range in the spec text, as `[start, end)` offsets.
- */
+/** A range in the spec text, as `[start, end)` offsets. */
 export type Range = { start: number; end: number }
 
 const toRange = ([start, end]: yaml.Range): Range => ({ start, end })

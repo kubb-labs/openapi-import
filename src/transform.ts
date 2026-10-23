@@ -6,18 +6,13 @@ import { parseDocument } from 'yaml'
 import { createLocator } from './locate.ts'
 import { createMappings, type Segment, type Targets } from './mappings.ts'
 
-/**
- * Parameters of the content mapper `transform` request.
- */
+/** Parameters of the content mapper `transform` request. */
 export type TransformParams = {
   fileName: string
   content: string
 }
 
-/**
- * Result of the content mapper `transform` request: the virtual TypeScript module TypeScript
- * checks in place of the spec file, and the segments linking its names back to the spec.
- */
+/** The module TypeScript checks in place of the spec, and the segments linking it to the spec. */
 export type TransformResult = {
   text: string
   extension: '.ts'
@@ -26,14 +21,9 @@ export type TransformResult = {
 }
 
 /**
- * Generates the output of every plugin in the project's `kubb.config.ts` for one OpenAPI
- * document as a single module, through `generateModule` from `unplugin-kubb`, so a bundler
- * importing the spec gets the same exports. Without a config, only `@kubb/plugin-ts` runs.
- *
- * The spec text comes from the request, not the disk, so unsaved editor changes are typed too.
- * It is parsed once: Kubb builds from the parsed object, and the same document places diagnostics
- * and mappings. Nothing is written: the build runs into a memory storage. A failed build returns
- * an empty module with the error-level diagnostics placed on the spec key they point at.
+ * Generates the module for one spec with `generateModule` from `unplugin-kubb`, the same one a
+ * bundler loads. Without a config, only `@kubb/plugin-ts` runs. The spec comes from the request,
+ * so unsaved edits are typed, and is parsed once for the build, the diagnostics and the mappings.
  */
 export async function transform({ fileName, content }: TransformParams, config?: UserConfig): Promise<TransformResult> {
   const document = parseDocument(content)

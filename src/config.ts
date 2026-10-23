@@ -4,29 +4,17 @@ import { resolve } from 'node:path'
 import type { UserConfig } from '@kubb/core'
 import { configFileCandidates, findConfigFile, loadConfigFile } from 'unplugin-kubb'
 
-/**
- * A Kubb config found for a TypeScript project, with what TypeScript needs to reload it.
- */
+/** A Kubb config found for a TypeScript project, with what TypeScript needs to reload it. */
 export type ProjectConfig = {
-  /**
-   * The project folder. Kubb resolves a config's `root` and `input` from here.
-   */
+  /** The project folder. Kubb resolves a config's `root` and `input` from here. */
   dir: string
-  /**
-   * The configs the file exports, empty when there is no config file.
-   */
+  /** The configs the file exports, empty when there is no config file. */
   configs: Array<UserConfig>
-  /**
-   * The config file, plus every file the CLI would pick up in `dir`, so adding one reloads too.
-   */
+  /** The config file, plus every file the CLI would pick up in `dir`, so adding one reloads too. */
   watchedFiles: Array<string>
-  /**
-   * Changes when the config file changes, so TypeScript transforms its specs again.
-   */
+  /** Changes when the config file changes, so TypeScript transforms its specs again. */
   identity: string
-  /**
-   * Why the config file failed to load. Each transform reports it on the spec.
-   */
+  /** Why the config file failed to load. Each transform reports it on the spec. */
   error?: string
 }
 
