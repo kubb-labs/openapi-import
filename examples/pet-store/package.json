@@ -9,7 +9,7 @@
     "typecheck": "tsc --runExternalCode"
   },
   "dependencies": {
-    "@kubb/plugin-ts": "^5.0.14",
+    "@kubb/plugin-ts": "^5.1.0",
     "@kubb/plugin-zod": "^5.4.12",
     "kubb": "^5.13.0",
     "openapi-import": "workspace:*",
