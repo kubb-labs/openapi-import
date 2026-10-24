@@ -1,5 +1,11 @@
 # openapi-import
 
+## 0.0.4
+
+### Patch Changes
+
+- [#12](https://github.com/kubb-labs/openapi-import/pull/12) [`b8b1ab6`](https://github.com/kubb-labs/openapi-import/commit/b8b1ab640553c383b68ad993758c44a1e888e8bf) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Link generated types to the spec through the pointer Kubb sets on each declaration, instead of guessing the spec key from the type name. Types from every plugin in the config are linked, not only `@kubb/plugin-ts` ones.
+
 ## 0.0.3
 
 ### Patch Changes
