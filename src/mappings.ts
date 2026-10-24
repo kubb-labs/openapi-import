@@ -6,11 +6,6 @@ import ts from '@typescript/typescript6'
  */
 export type Segment = [number, number, number, number, number, number]
 
-/**
- * The JSON pointer each emitted declaration came from, keyed by its name, as the build's file sources carry it.
- */
-export type Pointers = Map<string, string>
-
 type Locate = (pointer: string) => { start: number; end: number } | undefined
 
 /**
@@ -61,8 +56,9 @@ function typeMembers(statement: ts.TypeAliasDeclaration | ts.InterfaceDeclaratio
  * and operation types to the operation, parameters, request body or response. A schema type named
  * exactly like its key is verbatim, so a rename in TypeScript renames the key. A reference to a
  * schema type maps to the end of the `$ref` that points at that schema, so the rename updates it too.
+ * `pointers` maps each emitted declaration name to the JSON pointer it came from.
  */
-export function createMappings(text: string, content: string, { locate, locateValue }: Locators, pointers: Pointers): Array<Segment> {
+export function createMappings(text: string, content: string, { locate, locateValue }: Locators, pointers: Map<string, string>): Array<Segment> {
   const sourceFile = ts.createSourceFile('index.ts', text, ts.ScriptTarget.Latest, true)
   const segments: Array<Segment> = []
 

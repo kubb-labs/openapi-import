@@ -6,7 +6,7 @@ import { pluginTs, pluginTsName, resolverTs } from '@kubb/plugin-ts'
 import { generateModule } from 'unplugin-kubb'
 import { parseDocument } from 'yaml'
 import { createLocator } from './locate.ts'
-import { createMappings, type Pointers, type Segment } from './mappings.ts'
+import { createMappings, type Segment } from './mappings.ts'
 
 /**
  * Parameters of the content mapper `transform` request.
@@ -72,7 +72,7 @@ export async function transform({ fileName, content }: TransformParams, config?:
   }
 
   const hooks = new Hookable<KubbHooks>()
-  const pointers: Pointers = new Map()
+  const pointers = new Map<string, string>()
   hooks.hook('kubb:build:end', ({ files }) => {
     for (const source of files.flatMap((file) => file.sources)) {
       if (source.name && source.pointer) pointers.set(source.name, source.pointer)
