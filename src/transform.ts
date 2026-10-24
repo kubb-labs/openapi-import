@@ -6,7 +6,7 @@ import { pluginTs, pluginTsName, resolverTs } from '@kubb/plugin-ts'
 import { generateModule } from 'unplugin-kubb'
 import { parseDocument } from 'yaml'
 import { createLocator } from './locate.ts'
-import { createMappings, type Segment, type Targets } from './mappings.ts'
+import { createMappings, type Segment } from './mappings.ts'
 
 /**
  * Parameters of the content mapper `transform` request.
@@ -72,15 +72,11 @@ export async function transform({ fileName, content }: TransformParams, config?:
   }
 
   const hooks = new Hookable<KubbHooks>()
-  const targets: Targets = { schemas: new Map(), operations: new Map() }
-  hooks.hook('kubb:generate:schema', (node, { resolver }) => {
-    if (node.name) targets.schemas.set(resolver.name(node.name), node.name)
-  })
-  hooks.hook('kubb:generate:operation', (node, { resolver }) => {
-    if (!('path' in node && node.path && node.method)) return
-    // Operation types are always PascalCase, whatever casing a schema type keeps.
-    const target = { path: node.path, method: node.method }
-    targets.operations.set(resolver.name(node.operationId), target).set(resolverTs.name(node.operationId), target)
+  const pointers = new Map<string, string>()
+  hooks.hook('kubb:build:end', ({ files }) => {
+    for (const source of files.flatMap((file) => file.sources)) {
+      if (source.name && source.pointer) pointers.set(source.name, source.pointer)
+    }
   })
 
   const { text, errors } = await generateModule({
@@ -114,6 +110,6 @@ export async function transform({ fileName, content }: TransformParams, config?:
   return {
     text,
     extension: '.ts',
-    mappings: createMappings(text, content, { locate: (pointer) => locate({ pointer }), locateValue: (pointer) => locate({ pointer, value: true }) }, targets),
+    mappings: createMappings(text, content, { locate: (pointer) => locate({ pointer }), locateValue: (pointer) => locate({ pointer, value: true }) }, pointers),
   }
 }

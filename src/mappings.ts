@@ -6,20 +6,6 @@ import ts from '@typescript/typescript6'
  */
 export type Segment = [number, number, number, number, number, number]
 
-/**
- * What the build saw, keyed by the names `@kubb/plugin-ts` emitted.
- */
-export type Targets = {
-  /**
-   * Emitted type name to the `components.schemas` key it came from.
-   */
-  schemas: Map<string, string>
-  /**
-   * Emitted operation name prefix (such as `GetPetById`) to its path and method.
-   */
-  operations: Map<string, { path: string; method: string }>
-}
-
 type Locate = (pointer: string) => { start: number; end: number } | undefined
 
 /**
@@ -38,41 +24,8 @@ const refPrefix = '#/components/schemas/'
 
 const escapeToken = (token: string) => token.replaceAll('~', '~0').replaceAll('/', '~1')
 
-/**
- * Narrows an operation type to the part of the operation it was generated from, by the suffix
- * `@kubb/plugin-ts` appends to the operation name.
- */
-function operationPointer(base: string, suffix: string): string {
-  const status = /^Status(\d{3}|Default)/.exec(suffix)?.[1]
-  if (status) return `${base}/responses/${status === 'Default' ? 'default' : status}`
-  if (/^(Path|Query|Header)/.test(suffix)) return `${base}/parameters`
-  if (/^(Body|Request|MutationRequest)/.test(suffix)) return `${base}/requestBody`
-  return base
-}
-
-const longestPrefix = (keys: Iterable<string>, name: string) => [...keys].filter((key) => name.startsWith(key)).sort((a, b) => b.length - a.length)[0]
-
-/**
- * Pointers to try for one declaration, most specific first. Enums extracted from a schema property
- * (`OrderStatusEnumKey`, `orderStatusEnum`) point at that property, then at the schema.
- */
-function declarationPointers(name: string, { schemas, operations }: Targets): Array<string> {
-  const schema = schemas.get(name)
-  if (schema) return [`#/components/schemas/${escapeToken(schema)}`]
-
-  const schemaPrefix = longestPrefix(schemas.keys(), name)
-  const operationPrefix = longestPrefix(operations.keys(), name)
-
-  if (schemaPrefix !== undefined && (operationPrefix === undefined || schemaPrefix.length > operationPrefix.length)) {
-    const base = `#/components/schemas/${escapeToken(schemas.get(schemaPrefix)!)}`
-    const property = name.slice(schemaPrefix.length).replace(/(Enum)?Key$|Enum$/, '')
-    return property ? [`${base}/properties/${escapeToken(property[0]!.toLowerCase() + property.slice(1))}`, base] : [base]
-  }
-  if (operationPrefix === undefined) return []
-
-  const { path, method } = operations.get(operationPrefix)!
-  return [operationPointer(`#/paths/${escapeToken(path)}/${method.toLowerCase()}`, name.slice(operationPrefix.length))]
-}
+// A schema type's own key: `#/components/schemas/Pet`, not a property or an operation part under it.
+const isSchemaPointer = (pointer: string | undefined): pointer is string => !!pointer?.startsWith(refPrefix) && !pointer.slice(refPrefix.length).includes('/')
 
 /**
  * A property type without `| null` and one level of `T[]` or `Array<T>`, which the spec writes under `items`.
@@ -103,13 +56,14 @@ function typeMembers(statement: ts.TypeAliasDeclaration | ts.InterfaceDeclaratio
  * and operation types to the operation, parameters, request body or response. A schema type named
  * exactly like its key is verbatim, so a rename in TypeScript renames the key. A reference to a
  * schema type maps to the end of the `$ref` that points at that schema, so the rename updates it too.
+ * `pointers` maps each emitted declaration name to the JSON pointer it came from.
  */
-export function createMappings(text: string, content: string, { locate, locateValue }: Locators, targets: Targets): Array<Segment> {
+export function createMappings(text: string, content: string, { locate, locateValue }: Locators, pointers: Map<string, string>): Array<Segment> {
   const sourceFile = ts.createSourceFile('index.ts', text, ts.ScriptTarget.Latest, true)
   const segments: Array<Segment> = []
 
-  const add = (name: ts.Node, rename: boolean, ...pointers: Array<string>) => {
-    const range = pointers.map(locate).find(Boolean)
+  const add = (name: ts.Node, rename: boolean, pointer: string | undefined) => {
+    const range = pointer ? locate(pointer) : undefined
     if (!range) return
     const verbatim = rename && content.slice(range.start, range.end) === name.getText(sourceFile)
     segments.push([
@@ -127,7 +81,7 @@ export function createMappings(text: string, content: string, { locate, locateVa
     if (!inner || !ts.isTypeReferenceNode(inner.type) || !ts.isIdentifier(inner.type.typeName)) return
     const reference = inner.type.typeName
     const name = reference.text
-    if (!targets.schemas.has(name)) return
+    if (!isSchemaPointer(pointers.get(name))) return
     const range = locateValue(`${pointer}${inner.items ? '/items' : ''}/$ref`)
     if (!range) return
     // The `$ref` value may be quoted, so count the name back from the end of its text.
@@ -149,22 +103,19 @@ export function createMappings(text: string, content: string, { locate, locateVa
 
   for (const statement of sourceFile.statements) {
     if (ts.isVariableStatement(statement)) {
-      // Enum objects (`export const orderStatusEnum = { ... } as const`) match like their `Key` type.
+      // Enum objects (`export const orderStatusEnum = { ... } as const`) carry their own pointer.
       for (const declaration of statement.declarationList.declarations) {
-        if (!ts.isIdentifier(declaration.name)) continue
-        const name = declaration.name.text
-        add(declaration.name, false, ...declarationPointers(name, targets), ...declarationPointers(name[0]!.toUpperCase() + name.slice(1), targets))
+        if (ts.isIdentifier(declaration.name)) add(declaration.name, false, pointers.get(declaration.name.text))
       }
       continue
     }
     if (!ts.isTypeAliasDeclaration(statement) && !ts.isInterfaceDeclaration(statement)) continue
-    const pointers = declarationPointers(statement.name.text, targets)
-    const isSchema = targets.schemas.has(statement.name.text)
-    add(statement.name, isSchema, ...pointers)
+    const pointer = pointers.get(statement.name.text)
+    const isSchema = isSchemaPointer(pointer)
+    add(statement.name, isSchema, pointer)
 
     // Property names only resolve under a schema, not under operation parameters or responses.
-    const pointer = pointers[0]
-    if (!pointer || !isSchema) continue
+    if (!isSchema) continue
     const members = typeMembers(statement)
     if (members) addMembers(members, pointer)
     else if (ts.isTypeAliasDeclaration(statement)) addRef(unwrap(statement.type), pointer)
