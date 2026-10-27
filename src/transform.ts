@@ -52,9 +52,11 @@ async function bundleInput(fileName: string, input: unknown) {
     fileName,
     async (sourcePath) => {
       if (resolve(sourcePath) === resolve(fileName)) return input as object
-      const text = await readFile(sourcePath, 'utf8').catch(() => null)
+      const text = await readFile(sourcePath, 'utf8').catch((error: unknown) => {
+        dependencies[resolve(sourcePath)] = null
+        throw error
+      })
       dependencies[resolve(sourcePath)] = text
-      if (text === null) throw new Error(`Cannot read ${sourcePath}`)
       return parse(text)
     },
     {
@@ -133,13 +135,12 @@ export async function transform({ fileName, content }: TransformParams, config?:
   })
 
   const locate = createLocator(document)
-  const bundled = await bundleInput(fileName, document.toJS())
-  const { input, dependencies } = bundled
-  if (bundled.errors.length) {
+  const { input, dependencies, errors: refErrors } = await bundleInput(fileName, document.toJS())
+  if (refErrors.length) {
     return {
       text: 'export {}',
       extension: '.ts',
-      diagnostics: bundled.errors.map(({ message, pointer }) => {
+      diagnostics: refErrors.map(({ message, pointer }) => {
         const range = pointer ? locate({ pointer }) : undefined
         return { messageText: message, start: range?.start ?? 0, length: range ? range.end - range.start : 0 }
       }),
