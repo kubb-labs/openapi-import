@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "contentMappers": [{ "package": "openapi-import", "extensions": [".openapi.yaml"] }],
+  "include": ["./index.ts"]
+}
