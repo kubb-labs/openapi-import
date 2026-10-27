@@ -3,9 +3,10 @@ import path from 'node:path'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
-import { transform } from './transform.ts'
+import { readDependencies, transform } from './transform.ts'
 
 const fileName = path.resolve(import.meta.dirname, '../examples/pet-store/petStore.openapi.yaml')
+const externalRef = path.resolve(import.meta.dirname, '../fixtures/external-ref/api.openapi.yaml')
 
 describe('transform', () => {
   test('returns the plugin-ts types of a spec as one module', async () => {
@@ -64,6 +65,30 @@ describe('transform', () => {
     const [diagnostic] = (await transform({ fileName, content })).diagnostics ?? []
 
     expect(content.slice(diagnostic!.start, diagnostic!.start + diagnostic!.length)).toBe("'#/components/schemas/Missing'")
+  })
+})
+
+describe('transform external $ref', () => {
+  const schema = path.resolve(path.dirname(externalRef), 'schemas/pet.yaml')
+
+  test('inlines the file an external $ref points at and lists it as a dependency', async () => {
+    const result = await transform({ fileName: externalRef, content: await readFile(externalRef, 'utf8') })
+
+    expect(result.diagnostics).toBeUndefined()
+    expect(result.text).toMatch(/export type Pet = \{\s+name: string;/)
+    expect(result.dependencies).toEqual({ [schema]: await readFile(schema, 'utf8') })
+    expect(await readDependencies(externalRef)).toEqual([schema])
+  })
+
+  test('places a missing external $ref file on the key that points at it', async () => {
+    const content = (await readFile(externalRef, 'utf8')).replace('./schemas/pet.yaml', './schemas/missing.yaml')
+    const result = await transform({ fileName: externalRef, content })
+    const [diagnostic] = result.diagnostics ?? []
+
+    expect(result.text).toBe('export {}')
+    expect(diagnostic?.messageText).toContain('missing.yaml')
+    expect(content.slice(diagnostic!.start, diagnostic!.start + diagnostic!.length)).toBe('Pet')
+    expect(result.dependencies).toEqual({ [path.resolve(path.dirname(externalRef), 'schemas/missing.yaml')]: null })
   })
 })
 

@@ -1,10 +1,12 @@
+import { readFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import ts from '@typescript/typescript6'
 import type { UserConfig } from 'kubb'
 import { Hookable, type KubbHooks } from 'kubb/kit'
 import { pluginTs, pluginTsName, resolverTs } from '@kubb/plugin-ts'
 import { generateModule } from 'unplugin-kubb'
-import { parseDocument } from 'yaml'
+import { parse, parseDocument } from 'yaml'
+import { readOrNull } from './cache.ts'
 import { createLocator } from './locate.ts'
 import { createMappings, type Segment } from './mappings.ts'
 
@@ -24,6 +26,25 @@ export type TransformResult = {
   extension: '.ts'
   mappings?: Array<Segment>
   diagnostics?: Array<{ messageText: string; start: number; length: number }>
+  /**
+   * The text of each file an external `$ref` read, by absolute path, or `null` when it is missing.
+   * The server watches these files. It is not part of the protocol.
+   */
+  dependencies?: Record<string, string | null>
+}
+
+const isUrl = (source: string) => /^https?:\/\//i.test(source)
+
+// shortcut: Kubb reads each file before this does, so an edit in between is stored as already built; read through Kubb if that shows up.
+const toDependencies = (sources: Array<string>) => Object.fromEntries(sources.filter((source) => !isUrl(source)).map((file) => [file, readOrNull(file)]))
+
+/**
+ * The files that external `$ref`s in the spec at `fileName` read, with the spec as saved on disk.
+ */
+export async function readDependencies(fileName: string): Promise<Array<string>> {
+  const input = parse(await readFile(fileName, 'utf8'))
+  const { sources } = await generateModule({ root: dirname(fileName), input, config: { output: { path: '.' }, plugins: [] } })
+  return sources.filter((source) => !isUrl(source))
 }
 
 const scanner = ts.createScanner(ts.ScriptTarget.Latest, true)
@@ -79,7 +100,7 @@ export async function transform({ fileName, content }: TransformParams, config?:
     }
   })
 
-  const { text, errors } = await generateModule({
+  const { text, errors, sources } = await generateModule({
     root: dirname(fileName),
     input: document.toJS(),
     config: keepSpecCasing(config ?? { output: { path: '.' }, plugins: [pluginTs()] }),
@@ -87,6 +108,7 @@ export async function transform({ fileName, content }: TransformParams, config?:
   })
 
   const locate = createLocator(document)
+  const dependencies = toDependencies(sources)
 
   if (errors.length) {
     return {
@@ -96,6 +118,7 @@ export async function transform({ fileName, content }: TransformParams, config?:
         const range = error.location && 'pointer' in error.location ? locate(error.location) : undefined
         return { messageText: error.message, start: range?.start ?? 0, length: range ? range.end - range.start : 0 }
       }),
+      dependencies,
     }
   }
 
@@ -104,6 +127,7 @@ export async function transform({ fileName, content }: TransformParams, config?:
       text: 'export {}',
       extension: '.ts',
       diagnostics: [{ messageText: 'kubb.config.ts generated no code for this spec. Add a plugin such as pluginTs().', start: 0, length: 0 }],
+      dependencies,
     }
   }
 
@@ -111,5 +135,6 @@ export async function transform({ fileName, content }: TransformParams, config?:
     text,
     extension: '.ts',
     mappings: createMappings(text, content, { locate: (pointer) => locate({ pointer }), locateValue: (pointer) => locate({ pointer, value: true }) }, pointers),
+    dependencies,
   }
 }
