@@ -129,7 +129,7 @@ Leave `input` out of the config to import specs only. With an `input`, the bundl
 - Code a plugin writes to a separate file, such as a bundled client runtime, is not included. Point imports like a client's `importPath` at a package.
 - Properties of operation types don't link to the spec, and renaming one doesn't rename its key.
 - Files that `kubb.config.ts` imports are not watched. Restart the TypeScript server after you change them.
-- A `$ref` to a URL is not fetched and shows an error.
+- A `$ref` to a URL is fetched on each rebuild but not watched. Edit the spec or restart the TypeScript server to pick up a change to it.
 - `$ref` files are watched from the start for specs under the `tsconfig.json` folder. For a spec outside it, they are watched from the next time the project reloads, such as after a change to `kubb.config.ts`.
 - A changed spec rebuilds all of its types: about 0.4 s for a 10 KB spec and 2.6 s for a 1.4 MB spec.
 

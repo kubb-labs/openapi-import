@@ -22,7 +22,7 @@ const renameFeature = 256
 
 const refPrefix = '#/components/schemas/'
 
-export const escapeToken = (token: string) => token.replaceAll('~', '~0').replaceAll('/', '~1')
+const escapeToken = (token: string) => token.replaceAll('~', '~0').replaceAll('/', '~1')
 
 // A schema type's own key: `#/components/schemas/Pet`, not a property or an operation part under it.
 const isSchemaPointer = (pointer: string | undefined): pointer is string => !!pointer?.startsWith(refPrefix) && !pointer.slice(refPrefix.length).includes('/')

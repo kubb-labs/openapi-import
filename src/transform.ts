@@ -1,14 +1,14 @@
 import { readFile } from 'node:fs/promises'
-import { dirname, resolve } from 'node:path'
+import { dirname } from 'node:path'
 import ts from '@typescript/typescript6'
-import { bundle } from 'api-ref-bundler'
 import type { UserConfig } from 'kubb'
 import { Hookable, type KubbHooks } from 'kubb/kit'
 import { pluginTs, pluginTsName, resolverTs } from '@kubb/plugin-ts'
 import { generateModule } from 'unplugin-kubb'
 import { parse, parseDocument } from 'yaml'
+import { readOrNull } from './cache.ts'
 import { createLocator } from './locate.ts'
-import { createMappings, escapeToken, type Segment } from './mappings.ts'
+import { createMappings, type Segment } from './mappings.ts'
 
 /**
  * Parameters of the content mapper `transform` request.
@@ -33,52 +33,18 @@ export type TransformResult = {
   dependencies?: Record<string, string | null>
 }
 
-const hasExternalRef = (node: unknown): boolean =>
-  !!node &&
-  typeof node === 'object' &&
-  Object.entries(node).some(([key, value]) => (key === '$ref' && typeof value === 'string' ? !value.startsWith('#') : hasExternalRef(value)))
+const isUrl = (source: string) => /^https?:\/\//i.test(source)
 
-/**
- * Inlines the files that external `$ref`s point at, the way Kubb bundles a spec it reads from disk.
- * The spec itself comes from `input`, so unsaved edits stay. Every other file read lands in
- * `dependencies`, with `null` for a file that does not exist, and each `$ref` that failed in `errors`.
- */
-async function bundleInput(fileName: string, input: unknown) {
-  const dependencies: Record<string, string | null> = {}
-  const errors: Array<{ message: string; pointer?: string }> = []
-  if (!hasExternalRef(input)) return { input, dependencies, errors }
-
-  const bundled = await bundle(
-    fileName,
-    async (sourcePath) => {
-      if (resolve(sourcePath) === resolve(fileName)) return input as object
-      const text = await readFile(sourcePath, 'utf8').catch((error: unknown) => {
-        dependencies[resolve(sourcePath)] = null
-        throw error
-      })
-      dependencies[resolve(sourcePath)] = text
-      return parse(text)
-    },
-    {
-      hooks: {
-        // Only a `$ref` in the spec itself has a key to point the error at.
-        onError: (message, { path, state }) =>
-          errors.push({
-            message,
-            pointer: resolve(state.baseFile) === resolve(fileName) ? `/${path.map((token) => escapeToken(String(token))).join('/')}` : undefined,
-          }),
-      },
-    },
-  )
-  return { input: bundled, dependencies, errors }
-}
+// shortcut: Kubb reads each file before this does, so an edit in between is stored as already built; read through Kubb if that shows up.
+const toDependencies = (sources: Array<string>) => Object.fromEntries(sources.filter((source) => !isUrl(source)).map((file) => [file, readOrNull(file)]))
 
 /**
  * The files that external `$ref`s in the spec at `fileName` read, with the spec as saved on disk.
  */
 export async function readDependencies(fileName: string): Promise<Array<string>> {
-  const { dependencies } = await bundleInput(fileName, parse(await readFile(fileName, 'utf8')))
-  return Object.keys(dependencies)
+  const input = parse(await readFile(fileName, 'utf8'))
+  const { sources } = await generateModule({ root: dirname(fileName), input, config: { output: { path: '.' }, plugins: [] } })
+  return sources.filter((source) => !isUrl(source))
 }
 
 const scanner = ts.createScanner(ts.ScriptTarget.Latest, true)
@@ -134,26 +100,15 @@ export async function transform({ fileName, content }: TransformParams, config?:
     }
   })
 
-  const locate = createLocator(document)
-  const { input, dependencies, errors: refErrors } = await bundleInput(fileName, document.toJS())
-  if (refErrors.length) {
-    return {
-      text: 'export {}',
-      extension: '.ts',
-      diagnostics: refErrors.map(({ message, pointer }) => {
-        const range = pointer ? locate({ pointer }) : undefined
-        return { messageText: message, start: range?.start ?? 0, length: range ? range.end - range.start : 0 }
-      }),
-      dependencies,
-    }
-  }
-
-  const { text, errors } = await generateModule({
+  const { text, errors, sources } = await generateModule({
     root: dirname(fileName),
-    input,
+    input: document.toJS(),
     config: keepSpecCasing(config ?? { output: { path: '.' }, plugins: [pluginTs()] }),
     hooks,
   })
+
+  const locate = createLocator(document)
+  const dependencies = toDependencies(sources)
 
   if (errors.length) {
     return {
