@@ -1,5 +1,13 @@
 # openapi-import
 
+## 0.0.5
+
+### Patch Changes
+
+- [#15](https://github.com/kubb-labs/openapi-import/pull/15) [`e3f02a0`](https://github.com/kubb-labs/openapi-import/commit/e3f02a04004d68c22c1860f0fd060becb467c375) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Resolve `$ref`s to other files, such as `./schemas/pet.yaml`, and watch those files. Editing one updates the types and errors in the editor without restarting the TypeScript server. A missing file shows an error on the key that points at it.
+  
+  Requires `kubb` 5.14.5 or later, which bundles the `$ref` files and reports which files it read.
+
 ## 0.0.4
 
 ### Patch Changes
