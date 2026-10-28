@@ -1,6 +1,6 @@
 {
   "name": "openapi-import",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Import OpenAPI specs in TypeScript with types from Kubb, through TypeScript 7.1 content mappers. No generated files.",
   "keywords": [
     "code-generation",
