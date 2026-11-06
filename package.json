@@ -70,15 +70,15 @@
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
-    "@kubb/plugin-zod": "^5.8.0",
+    "@kubb/plugin-zod": "^5.8.1",
     "@types/node": "22.20.2",
-    "@vitest/coverage-v8": "^5.0.5",
+    "@vitest/coverage-v8": "^5.1.0",
     "kubb": "^5.15.4",
-    "oxfmt": "^0.75.0",
-    "oxlint": "^1.90.0",
-    "tsdown": "^0.23.4",
+    "oxfmt": "^0.76.0",
+    "oxlint": "^1.91.0",
+    "tsdown": "^0.23.5",
     "typescript": "7.1.0-beta",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
   },
   "peerDependencies": {
     "kubb": "^5.14.5"
