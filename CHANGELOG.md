@@ -1,5 +1,11 @@
 # openapi-import
 
+## 0.0.8
+
+### Patch Changes
+
+- [#27](https://github.com/kubb-labs/openapi-import/pull/27) [`b310a2c`](https://github.com/kubb-labs/openapi-import/commit/b310a2c2ee9aaac2bb0a2d51f58ce6b0da99c0c9) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Depend on `unplugin-kubb` 5.16.0. The `kubb` peer range stays at `^5.14.5`.
+
 ## 0.0.7
 
 ### Patch Changes
