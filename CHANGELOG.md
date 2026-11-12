@@ -1,5 +1,11 @@
 # openapi-import
 
+## 0.0.10
+
+### Patch Changes
+
+- [#33](https://github.com/kubb-labs/openapi-import/pull/33) [`3294278`](https://github.com/kubb-labs/openapi-import/commit/3294278d907eb0e773fdfd07452e798e49648c0c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Update `unplugin-kubb` to 5.18.6.
+
 ## 0.0.9
 
 ### Patch Changes
