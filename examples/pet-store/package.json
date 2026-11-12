@@ -11,7 +11,7 @@
   "dependencies": {
     "@kubb/plugin-ts": "^5.4.2",
     "@kubb/plugin-zod": "^5.8.3",
-    "kubb": "^5.18.2",
+    "kubb": "^5.18.6",
     "openapi-import": "workspace:*",
     "zod": "^4.6.7"
   },
