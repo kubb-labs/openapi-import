@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@43934da141f931b17239b97159a9421f2270e100 # main
+        uses: kubb-labs/config/.github/setup@45aaffaaf8ab17ffdcd46cf364adc32d5c6178a1 # main
 
       - name: Format
         run: pnpm run format:check
