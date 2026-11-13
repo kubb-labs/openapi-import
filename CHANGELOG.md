@@ -1,5 +1,11 @@
 # openapi-import
 
+## 0.0.11
+
+### Patch Changes
+
+- [#39](https://github.com/kubb-labs/openapi-import/pull/39) [`d132e58`](https://github.com/kubb-labs/openapi-import/commit/d132e58c3b2b8d6f4b66ab30e9a1e948e4ab22ad) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use Kubb 5.19.0.
+
 ## 0.0.10
 
 ### Patch Changes
