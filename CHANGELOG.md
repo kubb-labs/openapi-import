@@ -1,5 +1,11 @@
 # openapi-import
 
+## 0.0.12
+
+### Patch Changes
+
+- [#41](https://github.com/kubb-labs/openapi-import/pull/41) [`c3d775f`](https://github.com/kubb-labs/openapi-import/commit/c3d775fd16f3e00207e3b3fe2e0aecef7fc92fea) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use Kubb 5.20.1.
+
 ## 0.0.11
 
 ### Patch Changes
