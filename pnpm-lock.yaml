@@ -167,14 +167,14 @@ importers:
   .:
     dependencies:
       '@kubb/plugin-ts':
-        specifier: ^5.4.2
-        version: 5.4.2(@kubb/parser-ts@5.20.1)(@typescript/typescript6@6.0.2)(typescript@7.1.0-beta)
+        specifier: ^5.5.4
+        version: 5.5.4(@kubb/parser-ts@5.20.2)(@typescript/typescript6@6.0.2)(typescript@7.1.0-beta)
       '@typescript/typescript6':
         specifier: ^6.0.2
         version: 6.0.2
       unplugin-kubb:
-        specifier: ^5.20.1
-        version: 5.20.1(openapi-types@12.1.3)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: ^5.20.2
+        version: 5.20.2(openapi-types@12.1.3)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       yaml:
         specifier: ^2.9.1
         version: 2.9.1
@@ -186,17 +186,17 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3
       '@kubb/plugin-zod':
-        specifier: ^5.8.3
-        version: 5.8.3(zod@4.6.7)
+        specifier: ^5.9.4
+        version: 5.9.4(zod@4.6.7)
       '@types/node':
-        specifier: 22.20.2
-        version: 22.20.2
+        specifier: 22.20.5
+        version: 22.20.5
       '@vitest/coverage-v8':
         specifier: ^5.1.0
         version: 5.1.0(vitest@5.1.0)
       kubb:
-        specifier: ^5.20.1
-        version: 5.20.1(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.1.0-beta))(typescript@7.1.0-beta)(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: ^5.20.2
+        version: 5.20.2(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.1.0-beta))(typescript@7.1.0-beta)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       oxfmt:
         specifier: ^0.78.0
         version: 0.78.0
@@ -211,19 +211,19 @@ importers:
         version: 7.1.0-beta
       vitest:
         specifier: ^5.1.0
-        version: 5.1.0(@types/node@22.20.2)(@vitest/coverage-v8@5.1.0)(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        version: 5.1.0(@types/node@22.20.5)(@vitest/coverage-v8@5.1.0)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
 
   examples/pet-store:
     dependencies:
       '@kubb/plugin-ts':
-        specifier: ^5.4.2
-        version: 5.4.2(@kubb/parser-ts@5.20.1)(@typescript/typescript6@6.0.2)(typescript@7.1.0-beta)
+        specifier: ^5.5.4
+        version: 5.5.4(@kubb/parser-ts@5.20.2)(@typescript/typescript6@6.0.2)(typescript@7.1.0-beta)
       '@kubb/plugin-zod':
-        specifier: ^5.8.3
-        version: 5.8.3(zod@4.6.7)
+        specifier: ^5.9.4
+        version: 5.9.4(zod@4.6.7)
       kubb:
-        specifier: ^5.20.1
-        version: 5.20.1(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.1.0-beta))(typescript@7.1.0-beta)(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: ^5.20.2
+        version: 5.20.2(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.1.0-beta))(typescript@7.1.0-beta)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       openapi-import:
         specifier: workspace:*
         version: link:../..
@@ -386,22 +386,22 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@kubb/adapter-oas@5.20.1':
-    resolution: {integrity: sha512-dTrsY5in8KGSFir4cjk2B4H+Wq7mdyLRifdFfG7uKVcXsQwhZ1r3ZXePQfvDoKtBkIP/rN1SoilPtR960xYrAA==}
+  '@kubb/adapter-oas@5.20.2':
+    resolution: {integrity: sha512-AzByiELgmqwJQOz15OlBjkOs97edRvXqDv555zVr08QRb5LQj3FKBIhXkAfEy+zjxbbSazID9KxGqxLZuHDSNg==}
     engines: {node: '>=22.22'}
 
-  '@kubb/ast@5.20.1':
-    resolution: {integrity: sha512-lk1veKhddi12A0s5LsQ5oZYCFCdu0jaEpZYnBJbJWCw4fMIvJkXuuo0Y/NZ6jYIpRfyVpJVpuMABMemq8J1DMw==}
+  '@kubb/ast@5.20.2':
+    resolution: {integrity: sha512-p7e6WZ0Gvx7EAGqbpezDZQFnPqlTbBZvhHGa5i66UOW/zpYkv84U+YAAjWcSxTu9NSy5i7T2U+3mVi1CgsBUtA==}
     engines: {node: '>=22.22'}
 
-  '@kubb/cli@5.20.1':
-    resolution: {integrity: sha512-PLEfLog4gO15br6pacCOALZgZh63yiOqs0jkQzuvHM3qEK1ujKydwBY+a4S1iiTlzIsYg+tLfGvNt/rKhwR7RQ==}
+  '@kubb/cli@5.20.2':
+    resolution: {integrity: sha512-iMYdl8bUSamrFxGUCXlq/IFnsilFD+RD6VM67d2AmEFtG9xvpb/WuPZFadUNn6GOsi9E9Sg1OtD7HTSP5tarGQ==}
     engines: {node: '>=22.22'}
     hasBin: true
     peerDependencies:
-      '@kubb/adapter-oas': 5.20.1
-      '@kubb/mcp': 5.20.1
-      '@kubb/studio': 5.20.1
+      '@kubb/adapter-oas': 5.20.2
+      '@kubb/mcp': 5.20.2
+      '@kubb/studio': 5.20.2
     peerDependenciesMeta:
       '@kubb/adapter-oas':
         optional: true
@@ -410,38 +410,38 @@ packages:
       '@kubb/studio':
         optional: true
 
-  '@kubb/core@5.20.1':
-    resolution: {integrity: sha512-105uWZ6GXp0avPKCtMcJsLo0u5/YD0pDLKaZvUdeGLy5rFwfiXu60fS8Y/TtZNoV7HIQeW8yCVIHRVLv6oWo0g==}
+  '@kubb/core@5.20.2':
+    resolution: {integrity: sha512-0+jR+Cy1lqKsad1XrwnLy3yczwNnnOkL/CqSNqubY5FI9e+KOkxKMCX0hJNYKP8JxIdAj3HYxMQmOM9T/j9Cpw==}
     engines: {node: '>=22.22'}
 
-  '@kubb/kit@5.20.1':
-    resolution: {integrity: sha512-MocC4UQgTJQSrJyMWH7KGhHaLZ5/3n/ORUzSID5H2wQ67+z3lxl3KE/yinesBgWOJBXlv+ZCU34iYsRpmu+mKw==}
+  '@kubb/kit@5.20.2':
+    resolution: {integrity: sha512-h4R6Xov4fvqUANcfyDp+hTnQzRaF+siWnivqUCF4rQVuQbfESHy7/g4HNIL1/NJDNZ9O5XOROpHggvC2dRRcQA==}
     engines: {node: '>=22.22'}
 
-  '@kubb/mcp@5.20.1':
-    resolution: {integrity: sha512-s0eE9FujOZTKlQfI80BusfsB2s6gZZbuafwqP+FZggYhx2xauUmW2OJle/b/RFfqPBAIjh/dyveUGXgQLfS+0Q==}
+  '@kubb/mcp@5.20.2':
+    resolution: {integrity: sha512-DYzk7lYPfZMxGGXxpE8H8laOPHkTgPtAOElAgt3Q5s/p7NP2DIpt8PHgtg+MwfK7OzLrnpMUX/+ObKin2fMaFg==}
     engines: {node: '>=22.22'}
     hasBin: true
     peerDependencies:
-      '@kubb/renderer-jsx': 5.20.1
+      '@kubb/renderer-jsx': 5.20.2
 
-  '@kubb/parser-md@5.20.1':
-    resolution: {integrity: sha512-6yBNeAmn3w3at75iaIFwQ87xGx/45Lfs9r71JRuK70+BH+WLn4yp2WRS0IFXpCdWjReW6IRec7pR2OFce+AjyA==}
+  '@kubb/parser-md@5.20.2':
+    resolution: {integrity: sha512-B6VdBaycPVSwCWFlA1a4epLIq5bCEPWTxxBaZuKvtOZQ1or0mKgmC3c7TUDo61qSbaRBUH9w2T2dqVEJ+PHuhg==}
     engines: {node: '>=22.22'}
 
-  '@kubb/parser-ts@5.20.1':
-    resolution: {integrity: sha512-vRx627gdyOaKMx6P7diWidVs38tKOO5eHnO5UA9BOSE7GrRAXTiBstSoYAin5Yc0ktk0VXpdJcO/b7hRasLdLw==}
+  '@kubb/parser-ts@5.20.2':
+    resolution: {integrity: sha512-lUHFSUsvQSxe8wufXRO2vPHYnYCxU+02PX6aAK/PiuDq+Q/UjxV+VzR37zcSBbSKN75UeVpVQ8mFsjdBYEKetA==}
     engines: {node: '>=22.22'}
 
-  '@kubb/plugin-barrel@5.20.1':
-    resolution: {integrity: sha512-zdyxDDHAGjqktADiC109H5oBpUrrPhEKXppu+eYzVWoNbOZFx0AhxaOnrVTKg3+bNFqew0QXpy6FLfpopzQnyg==}
+  '@kubb/plugin-barrel@5.20.2':
+    resolution: {integrity: sha512-nD5uPjJVCxnAvkVEwxGLxvGMsLsjoPU95/HpkFLNf89M6KkGqs1zMd5Dh3RRl7wF32t/lU5kXTNKwputD0hfbw==}
     engines: {node: '>=22.22'}
 
-  '@kubb/plugin-ts@5.4.2':
-    resolution: {integrity: sha512-7UdzfYcJP39ev37c7UOlXlFPr+scGy9yYe9Cqarwg7jKMEvy7QDRSpeLqtVDFzJ3B31KzRvAyLwoO7fL4gJYlQ==}
+  '@kubb/plugin-ts@5.5.4':
+    resolution: {integrity: sha512-lEba/EFfwIs0AHCOIX87xv20iD4OHpbJMEap5iaJw97OPuxIYQmyIVBZbN5ZckA7Wk6EmZ0Q5n/0BuSsQZmKQg==}
     engines: {node: '>=22.22'}
     peerDependencies:
-      '@kubb/parser-ts': ^5.16.0
+      '@kubb/parser-ts': ^5.20.1
       '@typescript/typescript6': ^6.0.2
       typescript: '>=5.0.0'
     peerDependenciesMeta:
@@ -452,8 +452,8 @@ packages:
       typescript:
         optional: true
 
-  '@kubb/plugin-zod@5.8.3':
-    resolution: {integrity: sha512-GTVIa38Oq9hkvapDMYWMnoKkGVVyddyaaYJ5VJ3jE+s3RSJzUFqO8UD70cr5gUExWqgB2arl+Si+VF7q1Fg/vQ==}
+  '@kubb/plugin-zod@5.9.4':
+    resolution: {integrity: sha512-aQxlzpzR0LBrgvv8RYVmRT/cb11oitNkxIi+08MlJuB2h9DmtDo1UBNSvS60cEn2bA3vPrJgl9Y2qXkOVNnFAA==}
     engines: {node: '>=22.22'}
     peerDependencies:
       zod: ^4.0.0
@@ -461,12 +461,12 @@ packages:
       zod:
         optional: true
 
-  '@kubb/renderer-jsx@5.20.1':
-    resolution: {integrity: sha512-F+Svm+gwnZ5BrAeipxEMscvikW1rDPkcKDCZrzv7bRqOwsd9j28ZjStoGzm3FiedafRKDLAbnSNuHBX0C26BQA==}
+  '@kubb/renderer-jsx@5.20.2':
+    resolution: {integrity: sha512-hD67LoxDzR/vvATEeuKyZectoVZkregqQueswXr5//+XImO2ZPu83eBPt004MCmAvq0PaZrGv+/RtuGuErnPHA==}
     engines: {node: '>=22.22'}
 
-  '@kubb/studio@5.20.1':
-    resolution: {integrity: sha512-Cs3svYQ3lROuWmMI8TEBeJeW8/hBjFCpaOrtbdzymEj+c+5uZsrO+c+S9Zaii52uL/UpAlVM6lnBv4QRkz08LA==}
+  '@kubb/studio@5.20.2':
+    resolution: {integrity: sha512-TwLrzqbtzEWx/87IscATL6hQ6lSqDikPynZ773VV/7K7jLuKtvObKbykinhwPemJahsSlF5XTZ54x7zf1/amSw==}
     engines: {node: '>=22.22'}
     peerDependencies:
       tsdown: ^0.23.1
@@ -1093,8 +1093,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@22.20.2':
-    resolution: {integrity: sha512-xlvWf4Vs9n1PEVYwP1n4vvG07M6y8WgvJ2t0vbrWTmijsIHp1cS+uJ2kMIRdY3nHZK0nCYKrPeD171+SzF4/zw==}
+  '@types/node@22.20.5':
+    resolution: {integrity: sha512-U2+DNr+wSjpsTS/wZGYHq7GcwfuSmKiKvoPvK22zwTlRhU91yOniN4qRR5KhIjvif7ysw/dz/hKmfDH0Ris4aA==}
 
   '@typescript/typescript-aix-ppc64@7.1.0-beta':
     resolution: {integrity: sha512-DXDG+jIWxBHGdoO70tcHON33rCnSzsEZj9P13oyf/r/KEGIo6awsdSNVNjAw0uMwEpqRu75IrgCcW58YcVkZHg==}
@@ -1526,8 +1526,8 @@ packages:
     resolution: {integrity: sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ==}
     engines: {node: '>=0.10.0'}
 
-  kubb@5.20.1:
-    resolution: {integrity: sha512-cPu5Tyd1E497kjBjdoogckoNMccE1KgAi4ZG2SocFmtfsZ+U+WQ8ysQBrdY/RKsk7rV2uVt7z9UJFESTv03dbA==}
+  kubb@5.20.2:
+    resolution: {integrity: sha512-dwt3+0d2F8aowWoehN72yt+Kbl1rCv/8G2H8cDYfUd83R7IBDZZfkCOeypkSFYwwMX/ZEdy3jPpOF7p5LQ5yLg==}
     engines: {node: '>=22.22'}
     hasBin: true
 
@@ -1834,8 +1834,8 @@ packages:
     resolution: {integrity: sha512-EvRlUt/QqAEvXdQeRMYUfwOQsfzpDztykrG2owGEE/rBOBoYv9uF39ZzsNDh4lTFHhTr2XOZjKkYgueD12ZmGA==}
     engines: {node: '>=18.17'}
 
-  unplugin-kubb@5.20.1:
-    resolution: {integrity: sha512-aAG7PRnJJNCVAFG1o4dxzTevPTNQ9N1aSYJIKSTIbdecF83kolWgECaocHbdQuryb45kxYMpsT2EsFl0vKd0/g==}
+  unplugin-kubb@5.20.2:
+    resolution: {integrity: sha512-UJGkCIF+TQguNHwRN5Tc2D32WRq2YssTeqbw9OA0Rp1YhLoGfwnviT2W/QjWTGmbqi6ce0rh7hvPniz+2rVdBw==}
     engines: {node: '>=22.22'}
     peerDependencies:
       '@farmfe/core': ^1.7.0
@@ -2236,10 +2236,10 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@kubb/adapter-oas@5.20.1(openapi-types@12.1.3)':
+  '@kubb/adapter-oas@5.20.2(openapi-types@12.1.3)':
     dependencies:
-      '@kubb/core': 5.20.1
-      '@kubb/kit': 5.20.1
+      '@kubb/core': 5.20.2
+      '@kubb/kit': 5.20.2
       '@readme/openapi-parser': 10.0.0(openapi-types@12.1.3)
       '@scalar/openapi-upgrader': 0.4.7
       api-ref-bundler: 0.5.1
@@ -2248,13 +2248,13 @@ snapshots:
     transitivePeerDependencies:
       - openapi-types
 
-  '@kubb/ast@5.20.1': {}
+  '@kubb/ast@5.20.2': {}
 
-  '@kubb/cli@5.20.1(@kubb/adapter-oas@5.20.1(openapi-types@12.1.3))(@kubb/mcp@5.20.1(@kubb/renderer-jsx@5.20.1)(openapi-types@12.1.3)(typescript@7.1.0-beta))(@kubb/studio@5.20.1(tsdown@0.23.7(typescript@7.1.0-beta)))':
+  '@kubb/cli@5.20.2(@kubb/adapter-oas@5.20.2(openapi-types@12.1.3))(@kubb/mcp@5.20.2(@kubb/renderer-jsx@5.20.2)(openapi-types@12.1.3)(typescript@7.1.0-beta))(@kubb/studio@5.20.2(tsdown@0.23.7(typescript@7.1.0-beta)))':
     dependencies:
       '@clack/prompts': 1.9.0
       '@gunshi/plugin-dryrun': 0.37.3
-      '@kubb/core': 5.20.1
+      '@kubb/core': 5.20.2
       '@napi-rs/keyring': 2.1.2
       chokidar: 6.0.0
       gunshi: 0.37.3
@@ -2264,26 +2264,26 @@ snapshots:
       verkit: 0.5.0
       yuku-parser: 0.19.0
     optionalDependencies:
-      '@kubb/adapter-oas': 5.20.1(openapi-types@12.1.3)
-      '@kubb/mcp': 5.20.1(@kubb/renderer-jsx@5.20.1)(openapi-types@12.1.3)(typescript@7.1.0-beta)
-      '@kubb/studio': 5.20.1(tsdown@0.23.7(typescript@7.1.0-beta))
+      '@kubb/adapter-oas': 5.20.2(openapi-types@12.1.3)
+      '@kubb/mcp': 5.20.2(@kubb/renderer-jsx@5.20.2)(openapi-types@12.1.3)(typescript@7.1.0-beta)
+      '@kubb/studio': 5.20.2(tsdown@0.23.7(typescript@7.1.0-beta))
 
-  '@kubb/core@5.20.1':
+  '@kubb/core@5.20.2':
     dependencies:
-      '@kubb/ast': 5.20.1
+      '@kubb/ast': 5.20.2
       tinyexec: 1.3.1
       verkit: 0.5.0
 
-  '@kubb/kit@5.20.1':
+  '@kubb/kit@5.20.2':
     dependencies:
-      '@kubb/ast': 5.20.1
-      '@kubb/core': 5.20.1
+      '@kubb/ast': 5.20.2
+      '@kubb/core': 5.20.2
 
-  '@kubb/mcp@5.20.1(@kubb/renderer-jsx@5.20.1)(openapi-types@12.1.3)(typescript@7.1.0-beta)':
+  '@kubb/mcp@5.20.2(@kubb/renderer-jsx@5.20.2)(openapi-types@12.1.3)(typescript@7.1.0-beta)':
     dependencies:
-      '@kubb/adapter-oas': 5.20.1(openapi-types@12.1.3)
-      '@kubb/core': 5.20.1
-      '@kubb/renderer-jsx': 5.20.1
+      '@kubb/adapter-oas': 5.20.2(openapi-types@12.1.3)
+      '@kubb/core': 5.20.2
+      '@kubb/renderer-jsx': 5.20.2
       '@tmcp/adapter-valibot': 0.1.7(tmcp@1.20.1(typescript@7.1.0-beta))(valibot@1.5.0(typescript@7.1.0-beta))
       '@tmcp/transport-stdio': 0.5.1(tmcp@1.20.1(typescript@7.1.0-beta))
       jiti: 2.7.0
@@ -2293,48 +2293,48 @@ snapshots:
       - openapi-types
       - typescript
 
-  '@kubb/parser-md@5.20.1':
+  '@kubb/parser-md@5.20.2':
     dependencies:
-      '@kubb/ast': 5.20.1
-      '@kubb/core': 5.20.1
+      '@kubb/ast': 5.20.2
+      '@kubb/core': 5.20.2
       yaml: 2.9.1
 
-  '@kubb/parser-ts@5.20.1':
+  '@kubb/parser-ts@5.20.2':
     dependencies:
-      '@kubb/ast': 5.20.1
-      '@kubb/core': 5.20.1
+      '@kubb/ast': 5.20.2
+      '@kubb/core': 5.20.2
       yuku-parser: 0.19.0
 
-  '@kubb/plugin-barrel@5.20.1':
+  '@kubb/plugin-barrel@5.20.2':
     dependencies:
-      '@kubb/kit': 5.20.1
+      '@kubb/kit': 5.20.2
 
-  '@kubb/plugin-ts@5.4.2(@kubb/parser-ts@5.20.1)(@typescript/typescript6@6.0.2)(typescript@7.1.0-beta)':
+  '@kubb/plugin-ts@5.5.4(@kubb/parser-ts@5.20.2)(@typescript/typescript6@6.0.2)(typescript@7.1.0-beta)':
     dependencies:
-      '@kubb/kit': 5.20.1
-      '@kubb/renderer-jsx': 5.20.1
+      '@kubb/kit': 5.20.2
+      '@kubb/renderer-jsx': 5.20.2
       yuku-codegen: 0.19.0
     optionalDependencies:
-      '@kubb/parser-ts': 5.20.1
+      '@kubb/parser-ts': 5.20.2
       '@typescript/typescript6': 6.0.2
       typescript: 7.1.0-beta
 
-  '@kubb/plugin-zod@5.8.3(zod@4.6.7)':
+  '@kubb/plugin-zod@5.9.4(zod@4.6.7)':
     dependencies:
-      '@kubb/kit': 5.20.1
-      '@kubb/renderer-jsx': 5.20.1
+      '@kubb/kit': 5.20.2
+      '@kubb/renderer-jsx': 5.20.2
     optionalDependencies:
       zod: 4.6.7
 
-  '@kubb/renderer-jsx@5.20.1':
+  '@kubb/renderer-jsx@5.20.2':
     dependencies:
-      '@kubb/ast': 5.20.1
+      '@kubb/ast': 5.20.2
       yaml: 2.9.1
 
-  '@kubb/studio@5.20.1(tsdown@0.23.7(typescript@7.1.0-beta))':
+  '@kubb/studio@5.20.2(tsdown@0.23.7(typescript@7.1.0-beta))':
     dependencies:
-      '@kubb/ast': 5.20.1
-      '@kubb/core': 5.20.1
+      '@kubb/ast': 5.20.2
+      '@kubb/core': 5.20.2
       capnweb: 0.12.0
       diff: 9.0.0
       ofetch: 1.5.1
@@ -2707,7 +2707,7 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@22.20.2':
+  '@types/node@22.20.5':
     dependencies:
       undici-types: 6.21.0
 
@@ -2792,7 +2792,7 @@ snapshots:
       obug: 3.0.0
       std-env: 4.3.0
       tinyrainbow: 3.2.0
-      vitest: 5.1.0(@types/node@22.20.2)(@vitest/coverage-v8@5.1.0)(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+      vitest: 5.1.0(@types/node@22.20.5)(@vitest/coverage-v8@5.1.0)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
 
   '@vitest/istanbul-lib-coverage@2.1.0': {}
 
@@ -2800,14 +2800,14 @@ snapshots:
     dependencies:
       '@vitest/istanbul-lib-coverage': 2.1.0
 
-  '@vitest/mocker@5.1.0(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))':
+  '@vitest/mocker@5.1.0(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@vitest/spy': 5.1.0
       estree-walker: 3.0.3
       magic-string: 1.4.5
     optionalDependencies:
-      vite: 8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)
+      vite: 8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)
 
   '@vitest/spy@5.1.0': {}
 
@@ -2981,19 +2981,19 @@ snapshots:
 
   jsonpointer@5.0.1: {}
 
-  kubb@5.20.1(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.1.0-beta))(typescript@7.1.0-beta)(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)):
+  kubb@5.20.2(openapi-types@12.1.3)(rolldown@1.3.1)(tsdown@0.23.7(typescript@7.1.0-beta))(typescript@7.1.0-beta)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
-      '@kubb/adapter-oas': 5.20.1(openapi-types@12.1.3)
-      '@kubb/cli': 5.20.1(@kubb/adapter-oas@5.20.1(openapi-types@12.1.3))(@kubb/mcp@5.20.1(@kubb/renderer-jsx@5.20.1)(openapi-types@12.1.3)(typescript@7.1.0-beta))(@kubb/studio@5.20.1(tsdown@0.23.7(typescript@7.1.0-beta)))
-      '@kubb/core': 5.20.1
-      '@kubb/kit': 5.20.1
-      '@kubb/mcp': 5.20.1(@kubb/renderer-jsx@5.20.1)(openapi-types@12.1.3)(typescript@7.1.0-beta)
-      '@kubb/parser-md': 5.20.1
-      '@kubb/parser-ts': 5.20.1
-      '@kubb/plugin-barrel': 5.20.1
-      '@kubb/renderer-jsx': 5.20.1
-      '@kubb/studio': 5.20.1(tsdown@0.23.7(typescript@7.1.0-beta))
-      unplugin-kubb: 5.20.1(openapi-types@12.1.3)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+      '@kubb/adapter-oas': 5.20.2(openapi-types@12.1.3)
+      '@kubb/cli': 5.20.2(@kubb/adapter-oas@5.20.2(openapi-types@12.1.3))(@kubb/mcp@5.20.2(@kubb/renderer-jsx@5.20.2)(openapi-types@12.1.3)(typescript@7.1.0-beta))(@kubb/studio@5.20.2(tsdown@0.23.7(typescript@7.1.0-beta)))
+      '@kubb/core': 5.20.2
+      '@kubb/kit': 5.20.2
+      '@kubb/mcp': 5.20.2(@kubb/renderer-jsx@5.20.2)(openapi-types@12.1.3)(typescript@7.1.0-beta)
+      '@kubb/parser-md': 5.20.2
+      '@kubb/parser-ts': 5.20.2
+      '@kubb/plugin-barrel': 5.20.2
+      '@kubb/renderer-jsx': 5.20.2
+      '@kubb/studio': 5.20.2(tsdown@0.23.7(typescript@7.1.0-beta))
+      unplugin-kubb: 5.20.2(openapi-types@12.1.3)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
     transitivePeerDependencies:
       - '@farmfe/core'
       - '@nuxt/kit'
@@ -3317,20 +3317,20 @@ snapshots:
 
   undici@6.29.1: {}
 
-  unplugin-kubb@5.20.1(openapi-types@12.1.3)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)):
+  unplugin-kubb@5.20.2(openapi-types@12.1.3)(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
-      '@kubb/adapter-oas': 5.20.1(openapi-types@12.1.3)
-      '@kubb/core': 5.20.1
-      '@kubb/parser-md': 5.20.1
-      '@kubb/parser-ts': 5.20.1
-      '@kubb/plugin-barrel': 5.20.1
+      '@kubb/adapter-oas': 5.20.2(openapi-types@12.1.3)
+      '@kubb/core': 5.20.2
+      '@kubb/parser-md': 5.20.2
+      '@kubb/parser-ts': 5.20.2
+      '@kubb/plugin-barrel': 5.20.2
       jiti: 2.7.0
-      unplugin: 3.7.0(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+      unplugin: 3.7.0(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       yuku-codegen: 0.19.0
       yuku-parser: 0.19.0
     optionalDependencies:
       rolldown: 1.3.1
-      vite: 8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)
+      vite: 8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)
     transitivePeerDependencies:
       - '@rsbuild/core'
       - '@rspack/core'
@@ -3338,7 +3338,7 @@ snapshots:
       - openapi-types
       - unloader
 
-  unplugin@3.7.0(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)):
+  unplugin@3.7.0(rolldown@1.3.1)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@rolldown/pluginutils': 1.1.0
@@ -3346,7 +3346,7 @@ snapshots:
       webpack-virtual-modules: 0.6.2
     optionalDependencies:
       rolldown: 1.3.1
-      vite: 8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)
+      vite: 8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)
 
   uri-template-matcher@1.1.2: {}
 
@@ -3356,7 +3356,7 @@ snapshots:
 
   verkit@0.5.0: {}
 
-  vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1):
+  vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -3364,15 +3364,15 @@ snapshots:
       rolldown: 1.2.18
       tinyglobby: 0.2.17
     optionalDependencies:
-      '@types/node': 22.20.2
+      '@types/node': 22.20.5
       fsevents: 2.3.3
       jiti: 2.7.0
       yaml: 2.9.1
 
-  vitest@5.1.0(@types/node@22.20.2)(@vitest/coverage-v8@5.1.0)(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)):
+  vitest@5.1.0(@types/node@22.20.5)(@vitest/coverage-v8@5.1.0)(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.1.0(vite@8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+      '@vitest/mocker': 5.1.0(vite@8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1))
       chai: 6.3.0
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -3383,10 +3383,10 @@ snapshots:
       tinybench: 6.2.3
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
-      vite: 8.3.7(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)
+      vite: 8.3.7(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)
       why-is-node-running: 3.2.1
     optionalDependencies:
-      '@types/node': 22.20.2
+      '@types/node': 22.20.5
       '@vitest/coverage-v8': 5.1.0(vitest@5.1.0)
     transitivePeerDependencies:
       - msw
