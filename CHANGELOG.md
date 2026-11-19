@@ -1,5 +1,11 @@
 # openapi-import
 
+## 0.0.15
+
+### Patch Changes
+
+- [#47](https://github.com/kubb-labs/openapi-import/pull/47) [`752eac6`](https://github.com/kubb-labs/openapi-import/commit/752eac6bcfc934c647910097230e79c7e5750572) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Update `kubb`, `unplugin-kubb`, `@kubb/plugin-ts`, and `@kubb/plugin-zod` to the Kubb 5.22.0 line.
+
 ## 0.0.14
 
 ### Patch Changes
