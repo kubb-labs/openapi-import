@@ -64,21 +64,21 @@
   "dependencies": {
     "@kubb/plugin-ts": "^5.6.0",
     "@typescript/typescript6": "^6.0.2",
-    "unplugin-kubb": "^5.23.2",
+    "unplugin-kubb": "^5.23.5",
     "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
-    "@kubb/plugin-zod": "^5.11.0",
+    "@kubb/plugin-zod": "^5.11.2",
     "@types/node": "22.20.5",
-    "@vitest/coverage-v8": "^5.1.0",
-    "kubb": "^5.23.2",
+    "@vitest/coverage-v8": "^5.1.1",
+    "kubb": "^5.23.5",
     "oxfmt": "^0.78.0",
-    "oxlint": "^1.93.0",
+    "oxlint": "^1.94.0",
     "tsdown": "^0.23.7",
     "typescript": "7.1.0-beta",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   },
   "peerDependencies": {
     "kubb": "^5.14.5"
@@ -95,5 +95,5 @@
   "engines": {
     "node": ">=22.12"
   },
-  "packageManager": "pnpm@12.21.0"
+  "packageManager": "pnpm@12.22.0"
 }
